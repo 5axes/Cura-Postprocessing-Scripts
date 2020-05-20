@@ -1,23 +1,23 @@
-# Copyright (c) 2019 Laurent LALLIARD
-# Version 1.01 du 20/10/2019 Qui : LAL  Quoi : Ajout des noms des paramètres avec le label
-# Version 1.02 du 21/10/2019 Qui : LAL  Quoi : Ajout de nouveaux paramètres
-# Version 1.03 du 21/10/2019 Qui : LAL  Quoi : Info sur matière et profil + qualité
-# Version 2.00 du 21/10/2019 Qui : LAL  Quoi : Début ajout option Advanced settings
-# Version 2.01 du 22/10/2019 Qui : LAL  Quoi : Ajout option Extrudeur ID
-# Version 2.02 du 22/10/2019 Qui : LAL  Quoi : Ajout nouvelles options en mode avancé
-# Version 2.03 du 24/10/2019 Qui : LAL  Quoi : Ajout nouvelles options coque / speed et meshfix
-# Version 2.04 du 24/10/2019 Qui : LAL  Quoi : Ajout CuraVersion
-# Version 2.05 du 24/10/2019 Qui : LAL  Quoi : Affichage paramètre Extrudeur et pas Global
-# Version 2.06 du 25/10/2019 Qui : LAL  Quoi : Reduction liste parametre base et ajout distance retraction dans param base
-# Version 3.01 du 07/01/2020 Qui : LAL  Quoi : Passage au subroutine pour alléger le code
-# Version 4.01 du 15/01/2020 Qui : LAL  Quoi : Version sans Search and Replace, ajoute à la X eme ligne (Option)
-# Version 4.02 du 16/01/2020 Qui : LAL  Quoi : Ajout et test double extrusion
-# Version 5.00 du 07/03/2020 Qui : LAL  Quoi : Ajout info Nombre de couches plus lentes (speed_slowdown_layers)
-# Version 5.01 du 07/03/2020 Qui : LAL  Quoi : Ajout infos depuis 4.4 meshfix_maximum_resolution / meshfix_maximum_travel_resolution / meshfix_maximum_deviation
-# Version 5.02 du 07/03/2020 Qui : LAL  Quoi : Passage rétraction sur Travel
-# Version 5.03 du 07/04/2020 Qui : LAL  Quoi : Ajout infos largeur de ligne
-# Version 5.04 du 07/05/2020 Qui : LAL  Quoi : Ajout infos débit support et info sur xy_offset  (Version 4.6) 
-# Version 5.1.0 du 09/05/2020 Qui : LAL  Quoi : Ajout message pour 4.6
+# Copyright (c) 2019 5axes
+# Version 1.01 du 20/10/2019 Qui : 5axes  Quoi : Ajout des noms des paramètres avec le label
+# Version 1.02 du 21/10/2019 Qui : 5axes  Quoi : Ajout de nouveaux paramètres
+# Version 1.03 du 21/10/2019 Qui : 5axes  Quoi : Info sur matière et profil + qualité
+# Version 2.00 du 21/10/2019 Qui : 5axes  Quoi : Début ajout option Advanced settings
+# Version 2.01 du 22/10/2019 Qui : 5axes  Quoi : Ajout option Extrudeur ID
+# Version 2.02 du 22/10/2019 Qui : 5axes  Quoi : Ajout nouvelles options en mode avancé
+# Version 2.03 du 24/10/2019 Qui : 5axes  Quoi : Ajout nouvelles options coque / speed et meshfix
+# Version 2.04 du 24/10/2019 Qui : 5axes  Quoi : Ajout CuraVersion
+# Version 2.05 du 24/10/2019 Qui : 5axes  Quoi : Affichage paramètre Extrudeur et pas Global
+# Version 2.06 du 25/10/2019 Qui : 5axes  Quoi : Reduction liste parametre base et ajout distance retraction dans param base
+# Version 3.01 du 07/01/2020 Qui : 5axes  Quoi : Passage au subroutine pour alléger le code
+# Version 4.01 du 15/01/2020 Qui : 5axes  Quoi : Version sans Search and Replace, ajoute à la X eme ligne (Option)
+# Version 4.02 du 16/01/2020 Qui : 5axes  Quoi : Ajout et test double extrusion
+# Version 5.00 du 07/03/2020 Qui : 5axes  Quoi : Ajout info Nombre de couches plus lentes (speed_slowdown_layers)
+# Version 5.01 du 07/03/2020 Qui : 5axes  Quoi : Ajout infos depuis 4.4 meshfix_maximum_resolution / meshfix_maximum_travel_resolution / meshfix_maximum_deviation
+# Version 5.02 du 07/03/2020 Qui : 5axes  Quoi : Passage rétraction sur Travel
+# Version 5.03 du 07/04/2020 Qui : 5axes  Quoi : Ajout infos largeur de ligne
+# Version 5.04 du 07/05/2020 Qui : 5axes  Quoi : Ajout infos débit support et info sur xy_offset  (Version 4.6) 
+# Version 5.1.0 du 09/05/2020 Qui : 5axes  Quoi : Ajout message pour 4.6
 #
 
 from ..Script import Script
@@ -558,4 +558,4 @@ class GCodeDocumentation(Script):
         data[layer_index] = final_lines
 
         return data
-    
+   
