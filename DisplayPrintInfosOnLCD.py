@@ -1,11 +1,11 @@
 # Cura PostProcessingPlugin
 # Author:   Amanda de Castilho pour la partie Layer
 # Author:   Mathias Lyngklip Kjeldgaard pour la partie Temps restant
-# Author:   Laurent Lalliard
+# Author:   5axes
 # Date:     Janvier 02 2020
 # Modified: Janvier 05 2020  Option afficher LayerId
 
-# Description:  This plugin shows custom messages about your print on the Status bar...
+# Description:  This plugin shows custom messages about your print on the Printer Panel...
 #               Please look at the option
 #               - LayerId: Utilise le Layer ID codé dans le fichier origine
 
