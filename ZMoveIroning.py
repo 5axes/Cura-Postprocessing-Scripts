@@ -4,7 +4,7 @@ ZMoveIroning for 3D prints.
 
 Z hop for ironing
 
-Author: Laurent LALLIARD
+Author: 5axes
 Version: 1.0
 
 """
