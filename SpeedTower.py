@@ -1,5 +1,5 @@
 # Cura PostProcessingPlugin
-# Author:   Laurent LALLIARD
+# Author:   5axes
 # Date:     February 29, 2020
 #
 # Description:  postprocessing-script to easily define a Speed Tower
