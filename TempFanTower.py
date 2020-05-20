@@ -1,7 +1,7 @@
 # Cura PostProcessingPlugin
-# Author:   Christian Köhlke
+# Original Author:   Christian Köhlke
 # Date:     July 13, 2019
-
+#
 # Description:  postprocessing-script to easily use an temptower and not use 10 changeAtZ-scripts
 #
 #
@@ -11,7 +11,7 @@
 # https://www.thingiverse.com/thing:2493504
 #       Temp Tower PLA de 210 à 170
 #
-# Modification Laurent LALLIARD Pour ajouter la définition du ventilateur au départ
+# Modification 5axes pour ajouter la définition du ventilateur au départ
 #
 #   Version 1.1 9/01/2020
 #   Version 1.2 11/01/2020  Modification Fan après Bridge
