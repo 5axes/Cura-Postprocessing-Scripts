@@ -7,8 +7,9 @@ Installation
 
 The files must be stored in the user script directory of the respective Cura version: \AppData\Roaming\cura<version>\scripts
 
-After the next start of Cura the script can be added via Extension / Post-Processing / Modify G-Code Add a script
+After the next start of Cura the script can be added via Extension / Post-Processing / Modify G-Code Add a script.
 
+![Adding script](./images/plugins.jpg)
 
 
 DisplayPrintInfosOnLCD.py
