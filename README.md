@@ -1,23 +1,33 @@
 # Cura-Postprocessing-Scripts
 Compilation of personnal Ultimaker Cura postprocessing scripts
 
+
+Installation
+--
+
+The files must be stored in the user script directory of the respective Cura version: \AppData\Roaming\cura<version>\scripts
+
+After the next start of Cura the script can be added via Extension / Post-Processing / Modify G-Code Add a script
+
+
+
 DisplayPrintInfosOnLCD.py
-----
+-----
 
 Description:  This plugin shows custom messages about your print on the Printer Panel...
               Please look at the option
                - LayerId: Use the Layer ID coded in the Gcode and not an increment starting from 0
 
 GCodeDocumentation.py
-----
+-----
 Description: Add slicing paramter in the GCode Header
 
 SpeedTower.py
-----
+-----
 Description:  postprocessing-script to easily define a Speed Tower.
 
 TempFanTower.py
-----
+-----
 
 Description:  postprocessing-script to easily use an temptower and not use 10 changeAtZ-scripts
 
@@ -26,6 +36,6 @@ Description:  postprocessing-script to easily use an temptower and not use 10 ch
 
 
 ZMoveIroning.py
-----
+-----
 
 Description: ZMoveIroning for 3D prints. Z hop for ironing
