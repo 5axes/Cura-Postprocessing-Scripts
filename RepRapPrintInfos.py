@@ -3,8 +3,8 @@
 # Date:     Mars 06 2020
 # Modification :     Mars 07 2020
 #                    Ajout de l'intégration du fichier RepRapPrintInfos.txt pour image impression
-
-
+# https://3dprinter.sindoh.com/fr/support/downloads/3dwox1
+# Modification :     25/05/2020  add thumbnail_gcode
 # Description:  Ajout des infos pour machine RepRap machine 3DWOX
 
 from ..Script import Script
@@ -43,11 +43,6 @@ class RepRapPrintInfos(Script):
         ba = self._image_to_byte_array(image)
         ba64 = ba.toBase64()
         return ba64
-
-    def _txt_to_gcode_prusa(self, txt) -> str:
-        wrapper = textwrap.TextWrapper(initial_indent=self.GCODE_LINE_PREFIX, width=self.GCODE_LINE_WIDTH,
-                                    subsequent_indent=self.GCODE_LINE_PREFIX)
-        return wrapper.fill(txt)
 
     def _txt_to_gcode(self, txt) -> str:
         wrapper = textwrap.TextWrapper(width=self.GCODE_LINE_WIDTH)
@@ -92,7 +87,7 @@ class RepRapPrintInfos(Script):
         
     def getSettingDataString(self):
         return """{
-            "name": "Add RepRap Print Infos",
+            "name": "Add 3DWOX Print Infos",
             "key": "RepRapPrintInfos",
             "metadata": {},
             "version": 2,
