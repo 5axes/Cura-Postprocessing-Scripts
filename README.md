@@ -50,3 +50,11 @@ ZMoveIroning.py
 Description: ZMoveIroning for 3D prints. Z hop for ironing
 
 ![ZMoveIroning.py](./images/ZmoveIroning.jpg)
+
+
+RepRapPrintInfos.py
+-----
+
+Description: add header infos for RepRap machine 3DWOX  
+
+**Not fuly tested**
