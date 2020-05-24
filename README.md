@@ -55,6 +55,8 @@ Description: ZMoveIroning for 3D prints. Z hop for ironing
 RepRapPrintInfos.py
 -----
 
-Description: add header infos for RepRap machine 3DWOX  
+Description: add header infos and part thumbnail for RepRap machine 3DWOX  
+
+![part thumbnail](./images/benchy.jpg)
 
 **Not fuly tested**
