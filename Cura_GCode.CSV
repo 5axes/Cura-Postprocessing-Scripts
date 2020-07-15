@@ -1,0 +1,21 @@
+Command;Title;Parameter;;;;;;;
+M140;Set Bed Temperature;[S<temp>] - Target temperature;;;;;;;
+M190;Wait for Bed Temperature;[R<temp>]  - Target temperature;[S<temp>] - Target temperature;;;;;;
+M109;Wait for Hotend Temperature;[B<temp>] - With AUTOTEMP, the max auto-temperature;[F<flag>] - Autotemp flag. Omit to disable autotemp;[R<temp>] - Target temperature (wait for cooling or heating);[S<temp>] - Target temperature;[T<index>] - Hotend index;;;
+M107;Fan Off ;[P<index>] - Fan index;;;;;;;
+M106;Set Fan Speed;[P<index>] - Fan index;[S<speed>] - Speed;[T<secondary>] - Secondary speed;;;;;
+M84;Disable steppers;;;;;;;;
+M92;Set Axis Steps-per-unit;[E<steps>] - E steps per unit;[T<index>] - Target extruder;[X<steps>] - X steps per unit;[Y<steps>] - Y steps per unit;[Z<steps>] - Z steps per unit;;;
+G29;Bed Leveling;;;;;;;;
+M18;Disable steppers;;;;;;;;
+M204;Set Starting Acceleration;[P<accel>] - Printing acceleration;[R<accel>] - Retract acceleration;[T<accel>] - Travel acceleration;;;;;
+M205;Set Advanced Settings;[B<µs>] - Minimum segment time (µs);[E<jerk>] - E max jerk (units/s);"[J<deviation>] - Junction deviation (requires <code class=""highlighter-rouge"">JUNCTION_DEVIATION</code>)";[S<units/s>] - Minimum feedrate for print moves (units/s);[T<units/s>] - Minimum feedrate for travel moves (units/s);[X<jerk>] - X max jerk (units/s);[Y<jerk>] - Y max jerk (units/s);[Z<jerk>] - Z max jerk (units/s)
+M211;Software Endstops;[S<flag>] - Software endstops state;;;;;;;
+M203;Set Max Feedrate;[E<units/s>] - E axis max feedrate;"[T<index>] - Target extruder (Requires <code class=""highlighter-rouge"">DISTINCT_E_FACTORS</code>)";[X<units/s>] - X axis max feedrate;[Y<units/s>] - Y axis max feedrate;[Z<units/s>] - Z axis max feedrate;;;
+G90;Absolute Positioning;;;;;;;;
+M82;E Absolute;;;;;;;;
+M163;Set Mix Factor;[P<factor>] - Mix factor;[S<index>] - Component index;;;;;;
+M164;Save Mix;S<index> - Tool index (active virtual tool if omitted);;;;;;;
+M105;Report Temperatures;[T<index>] - Hotend index;;;;;;;
+G92;Set Position;[E<pos>] - New extruder position;[X<pos>] - New X axis position;[Y<pos>] - New Y axis position;[Z<pos>] - New Z axis position;;;;
+M104;Set Hotend Temperature;[B<temp>] - <code class="highlighter-rouge">AUTOTEMP</code>: The max auto-temperature;[F<flag>] - <code class="highlighter-rouge">AUTOTEMP</code>: Autotemp flag;[S<temp>] - Target temperature;[T<index>] - Hotend index
