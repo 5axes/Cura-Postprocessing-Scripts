@@ -64,7 +64,7 @@ Description: add header infos and part thumbnail for RepRap machine 3DWOX
 GradientInfill.py (Cura postprocessor PlugIn script)
 -----
 
-**Version : 1.5
+**Version : 1.5**
 
 GradientInfill.py Posprocessing Script for Cura PlugIn. Save the file in the _C:\Program Files\Ultimaker Cura **X.X**\plugins\PostProcessingPlugin\scripts_ directory.
 
@@ -102,3 +102,15 @@ Add a gradual speed variation for machine without direct drive extruder.
 
 Sample part with a Gradient distance set to 8 mm :
 ![82570108_1223017127904648_3642722292435255296_o](https://user-images.githubusercontent.com/11015345/72863337-8e827580-3cd0-11ea-9681-e1de7e2071c2.jpg)
+
+CommentGCode.py
+----
+
+This Cura Postprocessing Script adds comments to the G-Code. The user can select or deselect comments for M-Commands and G-Commands separately.
+
+G0 and G1 commands are only commented if a retract is included.
+
+Command, description and parameters are read from a CSV file. If a command is not contained, the required data is determined once via the website http://marlinfw.org/docs/gcode/ and added to the CSV file.
+
+![CommentGCode.py](./images/commentGCode.jpg)
+
