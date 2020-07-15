@@ -98,10 +98,10 @@ A new Flow Value for short distance (Linear move < 2 x Gradient distance) added 
 
 Add a gradual speed variation for machine without direct drive extruder.
 
-![82574446_1223039984569029_7656888964539744256_o](https://user-images.githubusercontent.com/11015345/72863160-ec628d80-3ccf-11ea-9891-8583b62866f7.jpg)
+![gradient infill](./images/gradient2.jpg)
 
 Sample part with a Gradient distance set to 8 mm :
-![82570108_1223017127904648_3642722292435255296_o](./images/!!gradient3.jpg)
+![Gradient distance set to 8 mm](./images/gradient3.jpg)
 
 CommentGCode.py
 ----
