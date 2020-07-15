@@ -13,7 +13,7 @@ M205;Set Advanced Settings;[B<µs>] - Minimum segment time (µs);[E<jerk>] - E m
 M211;Software Endstops;[S<flag>] - Software endstops state;;;;;;;
 M203;Set Max Feedrate;[E<units/s>] - E axis max feedrate;"[T<index>] - Target extruder (Requires <code class=""highlighter-rouge"">DISTINCT_E_FACTORS</code>)";[X<units/s>] - X axis max feedrate;[Y<units/s>] - Y axis max feedrate;[Z<units/s>] - Z axis max feedrate;;;
 G90;Absolute Positioning;;;;;;;;
-M82;E Absolute;;;;;;;;
+M82;Absolute Extrusion Mode;;;;;;;;
 M163;Set Mix Factor;[P<factor>] - Mix factor;[S<index>] - Component index;;;;;;
 M164;Save Mix;S<index> - Tool index (active virtual tool if omitted);;;;;;;
 M105;Report Temperatures;[T<index>] - Hotend index;;;;;;;
