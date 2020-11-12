@@ -1,4 +1,4 @@
-# Created by Wayne Porter
+# Custom Time Lapse
 
 from ..Script import Script
 
