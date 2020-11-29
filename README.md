@@ -48,8 +48,10 @@ RetractTower.py
 
 Description:  postprocessing-script to easily create a Retract Tower
 
-Two options
+Two options :
+
     - Speed   :  Speed variation
+	
     - Retract :  Retract variation
 
 ![RetractTower.py](./images/retract-tower.jpg)
