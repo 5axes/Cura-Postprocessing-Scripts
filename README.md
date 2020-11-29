@@ -48,7 +48,9 @@ RetractTower.py
 
 Description:  postprocessing-script to easily create a Retract Tower
 
-- Temp Tower PLA de 210 à 170
+Two options
+    - Speed   :  Speed variation
+    - Retract :  Retract variation
 
 ![RetractTower.py](./images/retract-tower.jpg)
 
