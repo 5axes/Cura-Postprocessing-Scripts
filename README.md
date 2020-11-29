@@ -52,9 +52,10 @@ Two options :
 
     - Speed   :  Speed variation
 	
-    - Retract :  Retract variation
+    - Retract :  Distance retract variation
 
 ![RetractTower.py](./images/retract-tower.jpg)
+
 
 ZMoveIroning.py
 -----
