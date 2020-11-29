@@ -40,8 +40,10 @@ Description:  postprocessing-script to easily use an temptower and not use 10 ch
 
  The default values are for this temptower PLA model [https://www.thingiverse.com/thing:2493504](https://www.thingiverse.com/thing:2493504)
 - Temp Tower PLA de 210 à 170
+- Possibility to define also a Fan Tower , Fan percentage speed indicate with semi-colon as seprator
 
 ![TempFanTower.py](./images/tempfan.jpg)
+
 
 RetractTower.py
 -----
