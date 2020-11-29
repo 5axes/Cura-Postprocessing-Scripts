@@ -2,7 +2,7 @@
 # Author:   5axes
 # Date:     November 29 2020
 #
-# Description:  postprocessing-script to easily define a Speed Tower
+# Description:  postprocessing-script to easily define a Retract Tower
 #
 #
 #   Version 1.0 29/11/2020
@@ -20,7 +20,7 @@ from UM.Message import Message
 from UM.i18n import i18nCatalog
 catalog = i18nCatalog("cura")
 
-__version__ = '1.0'
+__version__ = '1.1'
 
 class Section(Enum):
     """Enum for section type."""
@@ -153,6 +153,13 @@ class RetractTower(Script):
     
     def execute(self, data):
 
+        # Deprecation function
+        # extrud = list(Application.getInstance().getGlobalContainerStack().extruders.values())
+        extrud = Application.getInstance().getGlobalContainerStack().extruderList
+ 
+        relative_extrusion = bool(extrud[0].getProperty("relative_extrusion", "value"))
+         # Logger.log('d', 'Relative_extrusion : {}'.format(relative_extrusion))
+
         Instruction = self.getSettingValueByKey("command")
         StartValue = self.getSettingValueByKey("startValue")
         ValueChange = self.getSettingValueByKey("valueChange")
@@ -192,17 +199,31 @@ class RetractTower(Script):
                         if searchE:
                             current_e=float(searchE.group(1))
                             # Logger.log('d', 'CurE :' + str(current_e))
-                            if save_e>current_e:
-                                # Logger.log('d', 'Mode retract')
-                                if  (Instruction=='speed'):
-                                    lines[line_index] = "G1 F{:d} E{:f}".format(int(CurrentValue), current_e)
-                                if  (Instruction=='retract'):
-                                    current_e = save_e - CurrentValue
-                                    lines[line_index] = "G1 F{:d} E{:f}".format(int(current_f), current_e)                          
+                            if relative_extrusion:
+                                if current_e<0:
+                                    # Logger.log('d', 'Mode retract')
+                                    if  (Instruction=='speed'):
+                                        lines[line_index] = "G1 F{:d} E{:f}".format(int(CurrentValue), current_e)
+                                    if  (Instruction=='retract'):
+                                        lines[line_index] = "G1 F{:d} E{:f}".format(int(current_f), -CurrentValue)
+                                else:
+                                    # Logger.log('d', 'Mode reset')
+                                    if  (Instruction=='speed'):
+                                        lines[line_index] = "G1 F{:d} E{:f}".format(int(CurrentValue), current_e)
+                                    if  (Instruction=='retract'):
+                                        lines[line_index] = "G1 F{:d} E{:f}".format(int(current_f), CurrentValue)                                  
                             else:
-                                # Logger.log('d', 'Mode reset')
-                                if  (Instruction=='speed'):
-                                    lines[line_index] = "G1 F{:d} E{:f}".format(int(CurrentValue), current_e)  
+                                if save_e>current_e:
+                                    # Logger.log('d', 'Mode retract')
+                                    if  (Instruction=='speed'):
+                                        lines[line_index] = "G1 F{:d} E{:f}".format(int(CurrentValue), current_e)
+                                    if  (Instruction=='retract'):
+                                        current_e = save_e - CurrentValue
+                                        lines[line_index] = "G1 F{:d} E{:f}".format(int(current_f), current_e)                          
+                                else:
+                                    # Logger.log('d', 'Mode reset')
+                                    if  (Instruction=='speed'):
+                                        lines[line_index] = "G1 F{:d} E{:f}".format(int(CurrentValue), current_e)  
 
                 if is_extrusion_line(line):
                     searchE = re.search(r"E([-+]?\d*\.?\d*)", line)
