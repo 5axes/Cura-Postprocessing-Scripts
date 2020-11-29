@@ -115,15 +115,15 @@ class RetractTower(Script):
                 {
                     "label": "Starting value",
                     "description": "the starting value of the Tower.",
-                    "type": "int",
-                    "default_value": 8
+                    "type": "float",
+                    "default_value": 10
                 },
                 "valueChange":
                 {
                     "label": "Value Increment",
                     "description": "the value change of each block, can be positive or negative.",
-                    "type": "int",
-                    "default_value": 4
+                    "type": "float",
+                    "default_value": 10
                 },
                 "changelayer":
                 {
