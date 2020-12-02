@@ -76,7 +76,7 @@ Description: add header infos and part thumbnail for RepRap machine 3DWOX
 
 **Not fuly tested**
 
-GradientInfill.py (Cura postprocessor PlugIn script)
+GradientInfill.py (original idea from [CNCKitchen]https://github.com/CNCKitchen/GradientInfill)
 -----
 
 **Version : 1.5**
