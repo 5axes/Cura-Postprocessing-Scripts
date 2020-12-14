@@ -28,7 +28,7 @@ class InsertAtLayerChange(Script):
                 "increment_layer":
                 {
                     "label": "Layer increment",
-                    "description": "Layer increment to add this code",
+                    "description": "Number of layer increment to add this code",
                     "type": "int",
                     "value": "1",
                     "minimum_value": "1"
@@ -45,8 +45,10 @@ class InsertAtLayerChange(Script):
 
     def execute(self, data):
         increment = self.getSettingValueByKey("increment_layer")
-        
-        gcode_to_add = self.getSettingValueByKey("gcode_to_add") + "\n"
+        gcode_to_add = ";Code inserted by script : \n"
+        tablines = self.getSettingValueByKey("gcode_to_add").split("<br>")
+        for line in tablines:
+            gcode_to_add = gcode_to_add + line + "\n"
         cur_inc=1
         
         for layer in data:
