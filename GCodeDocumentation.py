@@ -19,7 +19,7 @@
 # Version 5.04 du 07/05/2020 Qui : 5axes  Quoi : Ajout infos débit support et info sur xy_offset  (Version 4.6) 
 # Version 5.1.0 du 09/05/2020 Qui : 5axes  Quoi : Ajout message pour 4.6
 #
-
+import string
 from ..Script import Script
 from UM.Application import Application # To get the current printer's settings.
 from cura.CuraVersion import CuraVersion  # type: ignore
@@ -87,6 +87,7 @@ class GCodeDocumentation(Script):
         GetLabel = Application.getInstance().getGlobalContainerStack().getProperty(key, "label")
         GetType = Application.getInstance().getGlobalContainerStack().getProperty(key, "type")
         GetUnit = Application.getInstance().getGlobalContainerStack().getProperty(key, "unit")
+
         # Format le texte
         new_line = self.SetSpace(GetLabel,dec)
         if GetUnit:
@@ -94,8 +95,10 @@ class GCodeDocumentation(Script):
                 GelValStr="{:.2f}".format(GetVal).replace(".00", "")  # Formatage
             else:
                 GelValStr=str(GetVal)
-            
+            ## some characters, like 40°C and 800mm/s² aren't ascii-encodable and cause errors
+            # filter(lambda x: x in string.printable, GetUnit)
             new_line = new_line + GelValStr + " " + str(GetUnit)
+            
         else:
             if str(GetType)=='bool':
                 new_line = new_line + "[" + str(GetVal) + "]"
