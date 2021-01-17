@@ -81,7 +81,7 @@ class SpeedTower(Script):
         ValueChange = self.getSettingValueByKey("valueChange")
         ChangeLayer = self.getSettingValueByKey("changelayer")
         ChangeLayerOffset = self.getSettingValueByKey("changelayeroffset")
-        ChangeLayerOffset += 1  # Modif pour tenir compte du décalage de numérotation dans Gcode
+        ChangeLayerOffset += 1  # Modified to take into account the numbering offset in Gcode
 
         CurrentValue = StartValue
         Command=""

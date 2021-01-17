@@ -114,14 +114,14 @@ class RetractTower(Script):
                 "startValue":
                 {
                     "label": "Starting value",
-                    "description": "the starting value of the Tower.",
+                    "description": "the starting value of the Tower (speed/distance).",
                     "type": "float",
                     "default_value": 10
                 },
                 "valueChange":
                 {
                     "label": "Value Increment",
-                    "description": "the value change of each block, can be positive or negative.",
+                    "description": "the value change of each block, can be positive or negative (speed/distance).",
                     "type": "float",
                     "default_value": 10
                 },
@@ -130,7 +130,7 @@ class RetractTower(Script):
                     "label": "Change Layer",
                     "description": "how many layers needs to be printed before the value should be changed.",
                     "type": "float",
-                    "default_value": 43,
+                    "default_value": 48,
                     "minimum_value": 1
                 },
                 "changelayeroffset":
@@ -138,7 +138,7 @@ class RetractTower(Script):
                     "label": "Change Layer Offset",
                     "description": "if the Tower has a base, put the layer high off it here",
                     "type": "float",
-                    "default_value": 3,
+                    "default_value": 4,
                     "minimum_value": 0
                 }
             }

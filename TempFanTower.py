@@ -1,17 +1,11 @@
 # Cura PostProcessingPlugin
-# Original Author:   Christian Köhlke
-# Date:     July 13, 2019
+# Author:   5axes
+# Date:     January 13, 2020
 #
 # Description:  postprocessing-script to easily use an temptower and not use 10 changeAtZ-scripts
 #
 #
-#
-# The default values are for this temptower PLA
-#
-# https://www.thingiverse.com/thing:2493504
-#       Temp Tower PLA de 210 à 170
-#
-# Modification 5axes pour ajouter la définition du ventilateur au départ
+# Modification 5axes to add fan change
 #
 #   Version 1.1 9/01/2020
 #   Version 1.2 11/01/2020  Modification Fan après Bridge
@@ -37,7 +31,7 @@ class TempFanTower(Script):
                     "label": "Starting Temperature",
                     "description": "the starting Temperature of the TempTower.",
                     "type": "int",
-                    "default_value": 210,
+                    "default_value": 220,
                     "minimum_value": 100,
                     "maximum_value": 300,
                     "minimum_value_warning": 150,
@@ -59,7 +53,7 @@ class TempFanTower(Script):
                     "label": "Change Layer",
                     "description": "how many layers needs to be printed before the temperature should be changed.",
                     "type": "float",
-                    "default_value": 34,
+                    "default_value": 48,
                     "minimum_value": 1,
                     "maximum_value": 1000,
                     "minimum_value_warning": 5,
