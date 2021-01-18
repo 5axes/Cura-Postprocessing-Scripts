@@ -53,7 +53,7 @@ class TempFanTower(Script):
                     "label": "Change Layer",
                     "description": "how many layers needs to be printed before the temperature should be changed.",
                     "type": "float",
-                    "default_value": 48,
+                    "default_value": 38,
                     "minimum_value": 1,
                     "maximum_value": 1000,
                     "minimum_value_warning": 5,
