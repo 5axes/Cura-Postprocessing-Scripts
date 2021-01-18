@@ -8,7 +8,7 @@
 # Modification 5axes to add fan change
 #
 #   Version 1.1 9/01/2020
-#   Version 1.2 11/01/2020  Modification Fan après Bridge
+#   Version 1.2 11/01/2020  Fan modification after Bridge
 #
 
 from ..Script import Script
