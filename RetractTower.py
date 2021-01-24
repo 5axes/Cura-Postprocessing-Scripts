@@ -130,7 +130,7 @@ class RetractTower(Script):
                     "label": "Change Layer",
                     "description": "how many layers needs to be printed before the value should be changed.",
                     "type": "float",
-                    "default_value": 48,
+                    "default_value": 38,
                     "minimum_value": 1
                 },
                 "changelayeroffset":
@@ -203,27 +203,27 @@ class RetractTower(Script):
                                 if current_e<0:
                                     # Logger.log('d', 'Mode retract')
                                     if  (Instruction=='speed'):
-                                        lines[line_index] = "G1 F{:d} E{:f}".format(int(CurrentValue), current_e)
+                                        lines[line_index] = "G1 F{:d} E{:.5f}".format(int(CurrentValue), current_e)
                                     if  (Instruction=='retract'):
-                                        lines[line_index] = "G1 F{:d} E{:f}".format(int(current_f), -CurrentValue)
+                                        lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), -CurrentValue)
                                 else:
                                     # Logger.log('d', 'Mode reset')
                                     if  (Instruction=='speed'):
-                                        lines[line_index] = "G1 F{:d} E{:f}".format(int(CurrentValue), current_e)
+                                        lines[line_index] = "G1 F{:d} E{:.5f}".format(int(CurrentValue), current_e)
                                     if  (Instruction=='retract'):
-                                        lines[line_index] = "G1 F{:d} E{:f}".format(int(current_f), CurrentValue)                                  
+                                        lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), CurrentValue)                                  
                             else:
                                 if save_e>current_e:
                                     # Logger.log('d', 'Mode retract')
                                     if  (Instruction=='speed'):
-                                        lines[line_index] = "G1 F{:d} E{:f}".format(int(CurrentValue), current_e)
+                                        lines[line_index] = "G1 F{:d} E{:.5f}".format(int(CurrentValue), current_e)
                                     if  (Instruction=='retract'):
                                         current_e = save_e - CurrentValue
-                                        lines[line_index] = "G1 F{:d} E{:f}".format(int(current_f), current_e)                          
+                                        lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), current_e)                          
                                 else:
                                     # Logger.log('d', 'Mode reset')
                                     if  (Instruction=='speed'):
-                                        lines[line_index] = "G1 F{:d} E{:f}".format(int(CurrentValue), current_e)  
+                                        lines[line_index] = "G1 F{:d} E{:.5f}".format(int(CurrentValue), current_e)  
 
                 if is_extrusion_line(line):
                     searchE = re.search(r"E([-+]?\d*\.?\d*)", line)
