@@ -6,6 +6,7 @@
 #
 #
 #   Version 1.0 29/11/2020
+#   Version 1.1 29/01/2021
 #
 
 from ..Script import Script
@@ -140,7 +141,14 @@ class RetractTower(Script):
                     "type": "float",
                     "default_value": 4,
                     "minimum_value": 0
-                }
+                },
+                "lcdfeedback":
+                {
+                    "label": "Display details on LCD?",
+                    "description": "This setting will insert M117 gcode instructions, to display current junction deviation value is being used.",
+                    "type": "bool",
+                    "default_value": true
+                }                 
             }
         }"""
 
@@ -160,6 +168,7 @@ class RetractTower(Script):
         relative_extrusion = bool(extrud[0].getProperty("relative_extrusion", "value"))
          # Logger.log('d', 'Relative_extrusion : {}'.format(relative_extrusion))
 
+        UseLcd = self.getSettingValueByKey("lcdfeedback")
         Instruction = self.getSettingValueByKey("command")
         StartValue = self.getSettingValueByKey("startValue")
         ValueChange = self.getSettingValueByKey("valueChange")
@@ -176,6 +185,7 @@ class RetractTower(Script):
             ValueChange = ValueChange*60
                                 
         # Logger.log('d', 'Instruction : {}'.format(Instruction))
+        lcd_gcode = "M117 Instruction : {}".format(Instruction)
 
         idl=0
         
@@ -204,26 +214,33 @@ class RetractTower(Script):
                                     # Logger.log('d', 'Mode retract')
                                     if  (Instruction=='speed'):
                                         lines[line_index] = "G1 F{:d} E{:.5f}".format(int(CurrentValue), current_e)
+                                        lcd_gcode = "M117 speed F{:d}".format(int(CurrentValue))
                                     if  (Instruction=='retract'):
                                         lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), -CurrentValue)
+                                        lcd_gcode = "M117 retract E{:.3}".format(float(CurrentValue))
                                 else:
                                     # Logger.log('d', 'Mode reset')
                                     if  (Instruction=='speed'):
                                         lines[line_index] = "G1 F{:d} E{:.5f}".format(int(CurrentValue), current_e)
+                                        lcd_gcode = "M117 speed F{:d}".format(int(CurrentValue))
                                     if  (Instruction=='retract'):
-                                        lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), CurrentValue)                                  
+                                        lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), CurrentValue)
+                                        lcd_gcode = "M117 retract E{:.3}".format(float(CurrentValue))                                        
                             else:
                                 if save_e>current_e:
                                     # Logger.log('d', 'Mode retract')
                                     if  (Instruction=='speed'):
                                         lines[line_index] = "G1 F{:d} E{:.5f}".format(int(CurrentValue), current_e)
+                                        lcd_gcode = "M117 speed F{:d}".format(int(CurrentValue))
                                     if  (Instruction=='retract'):
                                         current_e = save_e - CurrentValue
-                                        lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), current_e)                          
+                                        lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), current_e)
+                                        lcd_gcode = "M117 retract E{:.3}".format(float(CurrentValue))
                                 else:
                                     # Logger.log('d', 'Mode reset')
                                     if  (Instruction=='speed'):
-                                        lines[line_index] = "G1 F{:d} E{:.5f}".format(int(CurrentValue), current_e)  
+                                        lines[line_index] = "G1 F{:d} E{:.5f}".format(int(CurrentValue), current_e)
+                                        lcd_gcode = "M117 speed F{:d}".format(int(CurrentValue))
 
                 if is_extrusion_line(line):
                     searchE = re.search(r"E([-+]?\d*\.?\d*)", line)
@@ -234,11 +251,13 @@ class RetractTower(Script):
                     # 
                     if (layer_index==ChangeLayerOffset):
                         CurrentValue = StartValue
-
+                            
                     if ((layer_index-ChangeLayerOffset) % ChangeLayer == 0) and ((layer_index-ChangeLayerOffset)>0):
                         CurrentValue += ValueChange
+                    
+                    if UseLcd == True :
+                        lines.insert(line_index + 1, lcd_gcode)
                                                
-            
             result = "\n".join(lines)
             data[layer_index] = result
 
