@@ -18,6 +18,8 @@ import re #To perform the search
 from UM.Application import Application
 from UM.Message import Message
 
+__version__ = '1.1'
+
 class SpeedTower(Script):
     def __init__(self):
         super().__init__()
@@ -78,8 +80,8 @@ class SpeedTower(Script):
                 },
                 "lcdfeedback":
                 {
-                    "label": "Display details on LCD?",
-                    "description": "This setting will insert M117 gcode instructions, to display current junction deviation value is being used.",
+                    "label": "Display details on LCD",
+                    "description": "This setting will insert M117 gcode instructions, to display current modification in the G-Code is being used.",
                     "type": "bool",
                     "default_value": true
                 }                

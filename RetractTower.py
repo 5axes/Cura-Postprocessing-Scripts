@@ -7,6 +7,7 @@
 #
 #   Version 1.0 29/11/2020
 #   Version 1.1 29/01/2021
+#   Version 1.2 19/02/2021  : First instruction output
 #
 
 from ..Script import Script
@@ -21,7 +22,7 @@ from UM.Message import Message
 from UM.i18n import i18nCatalog
 catalog = i18nCatalog("cura")
 
-__version__ = '1.1'
+__version__ = '1.2'
 
 class Section(Enum):
     """Enum for section type."""
@@ -144,8 +145,8 @@ class RetractTower(Script):
                 },
                 "lcdfeedback":
                 {
-                    "label": "Display details on LCD?",
-                    "description": "This setting will insert M117 gcode instructions, to display current junction deviation value is being used.",
+                    "label": "Display details on LCD",
+                    "description": "This setting will insert M117 gcode instructions, to display current modification in the G-Code is being used.",
                     "type": "bool",
                     "default_value": true
                 }                 
@@ -179,13 +180,13 @@ class RetractTower(Script):
         CurrentValue = 0
         save_e = 0
         Command=""
- 
+
+        # Logger.log('d', 'Instruction : {:s}'.format(Instruction))
+        lcd_gcode = "M117 {:s} ({:.1f}/{:.1f})".format(Instruction,StartValue,ValueChange)
+        
         if  (Instruction=='speed'):
             StartValue = StartValue*60
             ValueChange = ValueChange*60
-                                
-        # Logger.log('d', 'Instruction : {}'.format(Instruction))
-        lcd_gcode = "M117 Instruction : {}".format(Instruction)
 
         idl=0
         
