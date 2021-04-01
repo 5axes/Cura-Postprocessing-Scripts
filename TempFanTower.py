@@ -34,8 +34,8 @@ class TempFanTower(Script):
                     "default_value": 220,
                     "minimum_value": 100,
                     "maximum_value": 300,
-                    "minimum_value_warning": 150,
-                    "maximum_value_warning": 250
+                    "minimum_value_warning": 170,
+                    "maximum_value_warning": 280
                 },
                 "temperaturechange":
                 {
@@ -53,7 +53,7 @@ class TempFanTower(Script):
                     "label": "Change Layer",
                     "description": "how many layers needs to be printed before the temperature should be changed.",
                     "type": "float",
-                    "default_value": 38,
+                    "default_value": 52,
                     "minimum_value": 1,
                     "maximum_value": 1000,
                     "minimum_value_warning": 5,
@@ -64,7 +64,7 @@ class TempFanTower(Script):
                     "label": "Change Layer Offset",
                     "description": "if the Temptower has a base, put the layer high off it here",
                     "type": "float",
-                    "default_value": 4,
+                    "default_value": 5,
                     "minimum_value": 0,
                     "maximum_value": 1000,
                     "maximum_value_warning": 100
