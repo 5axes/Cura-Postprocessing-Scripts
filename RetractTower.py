@@ -109,7 +109,7 @@ class RetractTower(Script):
                     "type": "enum",
                     "options": {
                         "speed": "Speed",
-                        "retract": "Retract"
+                        "distance": "Distance"
                     },
                     "default_value": "speed"
                 },
@@ -216,7 +216,7 @@ class RetractTower(Script):
                                     if  (Instruction=='speed'):
                                         lines[line_index] = "G1 F{:d} E{:.5f}".format(int(CurrentValue), current_e)
                                         lcd_gcode = "M117 speed F{:d}".format(int(CurrentValue))
-                                    if  (Instruction=='retract'):
+                                    if  (Instruction=='distance'):
                                         lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), -CurrentValue)
                                         lcd_gcode = "M117 retract E{:.3}".format(float(CurrentValue))
                                 else:
@@ -224,7 +224,7 @@ class RetractTower(Script):
                                     if  (Instruction=='speed'):
                                         lines[line_index] = "G1 F{:d} E{:.5f}".format(int(CurrentValue), current_e)
                                         lcd_gcode = "M117 speed F{:d}".format(int(CurrentValue))
-                                    if  (Instruction=='retract'):
+                                    if  (Instruction=='distance'):
                                         lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), CurrentValue)
                                         lcd_gcode = "M117 retract E{:.3}".format(float(CurrentValue))                                        
                             else:
@@ -233,7 +233,7 @@ class RetractTower(Script):
                                     if  (Instruction=='speed'):
                                         lines[line_index] = "G1 F{:d} E{:.5f}".format(int(CurrentValue), current_e)
                                         lcd_gcode = "M117 speed F{:d}".format(int(CurrentValue))
-                                    if  (Instruction=='retract'):
+                                    if  (Instruction=='distance'):
                                         current_e = save_e - CurrentValue
                                         lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), current_e)
                                         lcd_gcode = "M117 retract E{:.3}".format(float(CurrentValue))
