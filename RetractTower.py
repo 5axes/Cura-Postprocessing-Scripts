@@ -1,3 +1,5 @@
+#------------------------------------------------------------------------------------------------------------------------------------
+#
 # Cura PostProcessingPlugin
 # Author:   5axes
 # Date:     November 29 2020
@@ -8,21 +10,17 @@
 #   Version 1.0 29/11/2020
 #   Version 1.1 29/01/2021
 #   Version 1.2 19/02/2021  : First instruction output
+#   Version 1.3 18/04/2021  : ChangeLayerOffset += 2
 #
+#------------------------------------------------------------------------------------------------------------------------------------
 
 from ..Script import Script
 from UM.Logger import Logger
 from UM.Application import Application
 import re #To perform the search
-from cura.Settings.ExtruderManager import ExtruderManager
-from collections import namedtuple
 from enum import Enum
-from typing import List, Tuple
-from UM.Message import Message
-from UM.i18n import i18nCatalog
-catalog = i18nCatalog("cura")
 
-__version__ = '1.2'
+__version__ = '1.3'
 
 class Section(Enum):
     """Enum for section type."""
@@ -175,13 +173,14 @@ class RetractTower(Script):
         ValueChange = self.getSettingValueByKey("valueChange")
         ChangeLayer = self.getSettingValueByKey("changelayer")
         ChangeLayerOffset = self.getSettingValueByKey("changelayeroffset")
-        ChangeLayerOffset += 1  # Modif pour tenir compte du décalage de numérotation dans Gcode
+        ChangeLayerOffset += 2  # Modification to take into account the numbering offset in Gcode
+                                # layer_index = 0 for initial Block 1= Start Gcode normaly first layer = 0 
 
-        CurrentValue = 0
-        save_e = 0
+        CurrentValue = -1
+        save_e = -1
         Command=""
 
-        # Logger.log('d', 'Instruction : {:s}'.format(Instruction))
+        # Logger.log('d', 'Change Layer Offset : {}'.format(ChangeLayerOffset))
         lcd_gcode = "M117 {:s} ({:.1f}/{:.1f})".format(Instruction,StartValue,ValueChange)
         
         if  (Instruction=='speed'):
@@ -192,13 +191,14 @@ class RetractTower(Script):
         
         for layer in data:
             layer_index = data.index(layer)
+            # Logger.log('d', 'layer_index : {}'.format(layer_index))
             
             lines = layer.split("\n")
             for line in lines:                  
                 line_index = lines.index(line)
                 
                 # If we have define a value
-                if CurrentValue>0:
+                if CurrentValue>=0:
                     if is_retract_line(line):
                         # Logger.log('d', 'Retract_line : {}'.format(line))
                         searchF = re.search(r"F(\d*)", line)
@@ -247,15 +247,18 @@ class RetractTower(Script):
                     searchE = re.search(r"E([-+]?\d*\.?\d*)", line)
                     if searchE:
                         save_e=float(searchE.group(1))             
-                                             
+                
+                # Logger.log('d', 'L : {}'.format(line))
                 if line.startswith(";LAYER:"):
-                    # 
+                    # Initialize the change
                     if (layer_index==ChangeLayerOffset):
                         CurrentValue = StartValue
-                            
+                        lcd_gcode = "M117 START {:s} ({:.1f}/{:.1f})".format(Instruction,StartValue,ValueChange)
+                        # Logger.log('d', 'Start Layer Layer_index : {}'.format(layer_index))
+                    # Change the current value   
                     if ((layer_index-ChangeLayerOffset) % ChangeLayer == 0) and ((layer_index-ChangeLayerOffset)>0):
                         CurrentValue += ValueChange
-                    
+                    # Add M117 to add message on LCD
                     if UseLcd == True :
                         lines.insert(line_index + 1, lcd_gcode)
                                                

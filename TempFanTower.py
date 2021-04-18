@@ -1,3 +1,5 @@
+#------------------------------------------------------------------------------------------------------------------------------------
+#
 # Cura PostProcessingPlugin
 # Author:   5axes
 # Date:     January 13, 2020
@@ -9,10 +11,15 @@
 #
 #   Version 1.1 9/01/2020
 #   Version 1.2 11/01/2020  Fan modification after Bridge
+#   Version 1.3 18/04/2021  : ChangeLayerOffset += 2
 #
+#------------------------------------------------------------------------------------------------------------------------------------
 
 from ..Script import Script
 from UM.Application import Application
+from UM.Logger import Logger
+
+__version__ = '1.3'
 
 class TempFanTower(Script):
     def __init__(self):
@@ -93,7 +100,8 @@ class TempFanTower(Script):
         temperaturechange = self.getSettingValueByKey("temperaturechange")
         changelayer = self.getSettingValueByKey("changelayer")
         changelayeroffset = self.getSettingValueByKey("changelayeroffset")
-        changelayeroffset += 1  # Modif pour tenir compte du décalage de numérotation dans Gcode
+        ChangeLayerOffset += 2  # Modification to take into account the numbering offset in Gcode
+                                # layer_index = 0 for initial Block 1= Start Gcode normaly first layer = 0
         
         fanvalues_str = self.getSettingValueByKey("fanchange")
         fanvalues = fanvalues_str.split(";")

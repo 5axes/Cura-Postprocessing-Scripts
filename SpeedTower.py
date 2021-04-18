@@ -1,4 +1,5 @@
 #------------------------------------------------------------------------------------------------------------------------------------
+#
 # Cura PostProcessingPlugin
 # Author:   5axes
 # Date:     February 29, 2020
@@ -12,7 +13,8 @@
 #
 #   Version 1.0 29/02/2020
 #   Version 1.1 29/01/2021
-#   Version 1.2 05/04/2021 by dotdash32(https://github.com/dotdash32) for Marlin Linear Advance & RepRap Pressure Adance
+#   Version 1.2 05/04/2021 by dotdash32(https://github.com/dotdash32) for Marlin Linear Advance & RepRap Pressure Advance
+#   Version 1.3 18/04/2021  : ChangeLayerOffset += 2
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -101,7 +103,8 @@ class SpeedTower(Script):
         ValueChange = float(self.getSettingValueByKey("valueChange"))
         ChangeLayer = self.getSettingValueByKey("changelayer")
         ChangeLayerOffset = self.getSettingValueByKey("changelayeroffset")
-        ChangeLayerOffset += 1  # Modified to take into account the numbering offset in Gcode
+        ChangeLayerOffset += 2  # Modification to take into account the numbering offset in Gcode
+                                # layer_index = 0 for initial Block 1= Start Gcode normaly first layer = 0 
 
         CurrentValue = StartValue
         Command=""
