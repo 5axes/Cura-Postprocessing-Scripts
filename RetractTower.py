@@ -6,12 +6,14 @@
 #
 # Description:  postprocessing-script to easily define a Retract Tower
 #
+#------------------------------------------------------------------------------------------------------------------------------------
 #
 #   Version 1.0 29/11/2020
 #   Version 1.1 29/01/2021
 #   Version 1.2 19/02/2021  : First instruction output
 #   Version 1.3 18/04/2021  : ChangeLayerOffset += 2
-#   Version 1.4 18/04/2021  : Magane G91/G90 in code
+#   Version 1.4 01/06/2021  : Detect G91/G90 M82/M83 in G-Code
+#   Version 1.5 02/06/2021  : Detect G92 E0 in G-Code
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +23,7 @@ from UM.Application import Application
 import re #To perform the search
 from enum import Enum
 
-__version__ = '1.4'
+__version__ = '1.5'
 
 class Section(Enum):
     """Enum for section type."""
@@ -99,6 +101,17 @@ def is_not_relative_instruction_line(line: str) -> bool:
         bool: True contain a M82 / G91 instruction
     """
     return "G90" in line or "M82" in line
+
+def is_reset_extruder_line(line: str) -> bool:
+    """Check if current line contain a G92 E0
+
+    Args:
+        line (str): Gcode line
+
+    Returns:
+        bool: True contain a G92 E0 instruction
+    """
+    return "G92" in line and "E0" in line
     
 class RetractTower(Script):
     def __init__(self):
@@ -114,7 +127,7 @@ class RetractTower(Script):
             {
                 "command": {
                     "label": "Command",
-                    "description": "G-Code Commande",
+                    "description": "GCode Commande",
                     "type": "enum",
                     "options": {
                         "speed": "Speed",
@@ -199,6 +212,7 @@ class RetractTower(Script):
             ValueChange = ValueChange*60
 
         idl=0
+        current_e = 0
         
         for layer in data:
             layer_index = data.index(layer)
@@ -212,6 +226,9 @@ class RetractTower(Script):
                     relative_extrusion = True
                 if is_not_relative_instruction_line(line):
                     relative_extrusion = False
+                if is_reset_extruder_line(line):
+                    # Logger.log('d', 'Reset_extruder :' + str(current_e))
+                    current_e = 0
                     
                 # If we have define a value
                 if CurrentValue>=0:
