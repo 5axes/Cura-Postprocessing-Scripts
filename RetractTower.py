@@ -11,6 +11,7 @@
 #   Version 1.1 29/01/2021
 #   Version 1.2 19/02/2021  : First instruction output
 #   Version 1.3 18/04/2021  : ChangeLayerOffset += 2
+#   Version 1.4 18/04/2021  : Magane G91/G90 in code
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +21,7 @@ from UM.Application import Application
 import re #To perform the search
 from enum import Enum
 
-__version__ = '1.3'
+__version__ = '1.4'
 
 class Section(Enum):
     """Enum for section type."""
@@ -77,17 +78,27 @@ def is_not_extrusion_line(line: str) -> bool:
     """
     return "G0" in line and "X" in line and "Y" in line and not "E" in line
 
-def is_begin_skin_segment_line(line: str) -> bool:
-    """Check if current line is the start of an skin.
+def is_relative_instruction_line(line: str) -> bool:
+    """Check if current line contain a M83 / G91 instruction
 
     Args:
         line (str): Gcode line
 
     Returns:
-        bool: True if the line is the start of an skin section
+        bool: True contain a M83 / G91 instruction
     """
-    return line.startswith(";TYPE:SKIN")
-    
+    return "G91" in line or "M83" in line
+
+def is_not_relative_instruction_line(line: str) -> bool:
+    """Check if current line contain a M82 / G91 instruction
+
+    Args:
+        line (str): Gcode line
+
+    Returns:
+        bool: True contain a M82 / G91 instruction
+    """
+    return "G90" in line or "M82" in line
     
 class RetractTower(Script):
     def __init__(self):
@@ -103,7 +114,7 @@ class RetractTower(Script):
             {
                 "command": {
                     "label": "Command",
-                    "description": "GCode Commande",
+                    "description": "G-Code Commande",
                     "type": "enum",
                     "options": {
                         "speed": "Speed",
@@ -138,7 +149,7 @@ class RetractTower(Script):
                     "label": "Change Layer Offset",
                     "description": "if the Tower has a base, put the layer high off it here",
                     "type": "float",
-                    "default_value": 4,
+                    "default_value": 5,
                     "minimum_value": 0
                 },
                 "lcdfeedback":
@@ -197,6 +208,11 @@ class RetractTower(Script):
             for line in lines:                  
                 line_index = lines.index(line)
                 
+                if is_relative_instruction_line(line):
+                    relative_extrusion = True
+                if is_not_relative_instruction_line(line):
+                    relative_extrusion = False
+                    
                 # If we have define a value
                 if CurrentValue>=0:
                     if is_retract_line(line):
