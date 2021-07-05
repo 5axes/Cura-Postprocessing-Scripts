@@ -2,3 +2,10 @@
 *.pyc
 RetractTowerA.py
 live_script.py
+TempFanTower.py
+TemperatureTower.py
+TempFanTower.py
+SpeedTower.py
+RetractTower.py
+GCodeDocumentation.py
+DisplayPrintInfosOnLCD.py
