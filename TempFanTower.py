@@ -1,13 +1,13 @@
 #------------------------------------------------------------------------------------------------------------------------------------
 #
-# Cura PostProcessingPlugin
+# Cura PostProcessing Script
 # Author:   5axes
 # Date:     January 13, 2020
 #
 # Description:  postprocessing-script to easily use an temptower and not use 10 changeAtZ-scripts
 #
 #
-# Modification 5axes to add fan change
+#------------------------------------------------------------------------------------------------------------------------------------
 #
 #   Version 1.1 9/01/2020
 #   Version 1.2 11/01/2020  Fan modification after Bridge
@@ -37,7 +37,7 @@ class TempFanTower(Script):
                 "startTemperature":
                 {
                     "label": "Starting Temperature",
-                    "description": "the starting Temperature of the TempTower.",
+                    "description": "The starting temperature of the TempTower",
                     "type": "int",
                     "default_value": 220,
                     "minimum_value": 100,
@@ -48,7 +48,7 @@ class TempFanTower(Script):
                 "temperaturechange":
                 {
                     "label": "Temperature Increment",
-                    "description": "the temperature change of each block, can be positive or negative. I you want 220 and then 210, you need to set this to -10.",
+                    "description": "The temperature change of each block, can be positive or negative. I you want 220 and then 210, you need to set this to -10",
                     "type": "int",
                     "default_value": -5,
                     "minimum_value": -100,
@@ -59,7 +59,7 @@ class TempFanTower(Script):
                 "changelayer":
                 {
                     "label": "Change Layer",
-                    "description": "how many layers needs to be printed before the temperature should be changed.",
+                    "description": "How many layers needs to be printed before the temperature should be changed",
                     "type": "float",
                     "default_value": 52,
                     "minimum_value": 1,
@@ -70,7 +70,7 @@ class TempFanTower(Script):
                 "changelayeroffset":
                 {
                     "label": "Change Layer Offset",
-                    "description": "if the Temptower has a base, put the layer high off it here",
+                    "description": "If the Temptower has a base, put the layer high off it here",
                     "type": "float",
                     "default_value": 5,
                     "minimum_value": 0,
@@ -80,14 +80,14 @@ class TempFanTower(Script):
                 "usefanvalue":
                 {
                     "label": "Activate Fan Tower",
-                    "description": "Activate also a Fan variation to create a Fan tower",
+                    "description": "Activate also a fan variation to create a Fan Tower",
                     "type": "bool",
                     "default_value": false
                 },
                 "fanchange":
                 {
                     "label": "Fan values in %",
-                    "description": "the fan speed change of each block, list value separated by a comma ';' ",
+                    "description": "The fan speed change of each block, list value separated by a comma ';' ",
                     "type": "str",
                     "default_value": "100;40;0",
                     "enabled": "usefanvalue"

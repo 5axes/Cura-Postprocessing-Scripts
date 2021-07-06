@@ -1,14 +1,15 @@
+#
 # Cura PostProcessingPlugin
-# Author:   Amanda de Castilho pour la partie Layer
-# Author:   Mathias Lyngklip Kjeldgaard pour la partie Temps restant
+# Author:   Amanda de Castilho for the Layer part
+# Author:   Mathias Lyngklip Kjeldgaard for the remaining time part
 # Author:   5axes
 # Date:     Janvier 02 2020
-# Modified: Janvier 05 2020  Option afficher LayerId
-
-# Description:  This plugin shows custom messages about your print on the Printer Panel...
+# Modified: Janvier 05 2020  Option Display LayerId
+#
+# Description:  This script shows custom messages about your print on the Printer Panel...
 #               Please look at the option
-#               - LayerId: Utilise le Layer ID codé dans le fichier origine
-
+#               - LayerId: Uses the Layer ID encoded in the original file
+#
 from ..Script import Script
 from UM.Application import Application
 
@@ -26,8 +27,8 @@ class DisplayPrintInfosOnLCD(Script):
             {
                 "LayerId":
                 {
-                    "label": "Utilisation Layer Id G-Code",
-                    "description": "Utilise le Layer Id codé dans le fichier G-Code. A utiliser pour impression pièce à pièce",
+                    "label": "Use Layer Id G-Code",
+                    "description": "Uses the Layer Id encoded in the G-Code file. Must be used in Print Sequence : One at a time",
                     "type": "bool",
                     "default_value": false
                 }

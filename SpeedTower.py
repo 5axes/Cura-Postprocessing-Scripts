@@ -1,15 +1,17 @@
 #------------------------------------------------------------------------------------------------------------------------------------
 #
-# Cura PostProcessingPlugin
+# Cura PostProcessing Script
 # Author:   5axes
 # Date:     February 29, 2020
 #
-# Description:  postprocessing-script to easily define a Speed Tower 
+# Description:  postprocessing script to easily define a Speed Tower 
 #           Option for  Speed
 #                       Acceleration
 #                       Junction Deviation
 #                       Marlin Linear Advance
 #                       RepRap Pressure Adance
+#
+#------------------------------------------------------------------------------------------------------------------------------------
 #
 #   Version 1.0 29/02/2020
 #   Version 1.1 29/01/2021

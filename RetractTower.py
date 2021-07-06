@@ -1,10 +1,10 @@
 #------------------------------------------------------------------------------------------------------------------------------------
 #
-# Cura PostProcessingPlugin
+# Cura PostProcessing Script
 # Author:   5axes
 # Date:     November 29 2020
 #
-# Description:  postprocessing-script to easily define a Retract Tower
+# Description:  postprocessing script to easily define a Retract Tower
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 #
@@ -15,6 +15,15 @@
 #   Version 1.4 01/06/2021  : Detect G91/G90 M82/M83 in G-Code
 #                               https://github.com/5axes/Calibration-Shapes/issues/28
 #   Version 1.5 02/06/2021  : Detect G92 E0 in G-Code
+#   Version 1.6 04/07/2021  : Bug in Extrusion mode on the first call we should have the retraction value equal to the first test value.
+#                              Otherwise we could have an issue  IE : -5  -> 1.000
+#
+#                                  G1 F2700 E-5
+#                                  ....
+#                                  ;LAYER:4
+#                                  M117 START distance (1.0/1.0)
+#                                  ....
+#                                  G1 F2700 E1.00000
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -190,7 +199,7 @@ class RetractTower(Script):
         extrud = Application.getInstance().getGlobalContainerStack().extruderList
  
         relative_extrusion = bool(extrud[0].getProperty("relative_extrusion", "value"))
-         # Logger.log('d', 'Relative_extrusion : {}'.format(relative_extrusion))
+        # Logger.log('d', 'Relative_extrusion : {}'.format(relative_extrusion))
 
         UseLcd = self.getSettingValueByKey("lcdfeedback")
         Instruction = self.getSettingValueByKey("command")
@@ -214,6 +223,7 @@ class RetractTower(Script):
 
         idl=0
         current_e = 0
+        first_code = False
         
         for layer in data:
             layer_index = data.index(layer)
@@ -225,6 +235,8 @@ class RetractTower(Script):
                 
                 if is_relative_instruction_line(line):
                     relative_extrusion = True
+                    # Logger.log('d', 'Relative_extrusion founded : {}'.format(line))
+                    
                 if is_not_relative_instruction_line(line):
                     relative_extrusion = False
                 if is_reset_extruder_line(line):
@@ -254,12 +266,16 @@ class RetractTower(Script):
                                         lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), -CurrentValue)
                                         lcd_gcode = "M117 retract E{:.3}".format(float(CurrentValue))
                                 else:
-                                    # Logger.log('d', 'Mode reset')
+                                    # Logger.log('d', 'Mode reset: {}'.format(first_code))
                                     if  (Instruction=='speed'):
                                         lines[line_index] = "G1 F{:d} E{:.5f}".format(int(CurrentValue), current_e)
                                         lcd_gcode = "M117 speed F{:d}".format(int(CurrentValue))
                                     if  (Instruction=='distance'):
-                                        lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), CurrentValue)
+                                        if first_code == True:
+                                            lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), current_e)
+                                            first_code = False
+                                        else :
+                                            lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), CurrentValue)
                                         lcd_gcode = "M117 retract E{:.3}".format(float(CurrentValue))                                        
                             else:
                                 if save_e>current_e:
@@ -288,6 +304,7 @@ class RetractTower(Script):
                     if (layer_index==ChangeLayerOffset):
                         CurrentValue = StartValue
                         lcd_gcode = "M117 START {:s} ({:.1f}/{:.1f})".format(Instruction,StartValue,ValueChange)
+                        first_code = True
                         # Logger.log('d', 'Start Layer Layer_index : {}'.format(layer_index))
                     # Change the current value   
                     if ((layer_index-ChangeLayerOffset) % ChangeLayer == 0) and ((layer_index-ChangeLayerOffset)>0):

@@ -1,23 +1,32 @@
 # Copyright (c) 2019 5axes
-# Version 1.01 du 20/10/2019 Qui : 5axes  Quoi : Ajout des noms des paramètres avec le label
-# Version 1.02 du 21/10/2019 Qui : 5axes  Quoi : Ajout de nouveaux paramètres
-# Version 1.03 du 21/10/2019 Qui : 5axes  Quoi : Info sur matière et profil + qualité
-# Version 2.00 du 21/10/2019 Qui : 5axes  Quoi : Début ajout option Advanced settings
-# Version 2.01 du 22/10/2019 Qui : 5axes  Quoi : Ajout option Extrudeur ID
-# Version 2.02 du 22/10/2019 Qui : 5axes  Quoi : Ajout nouvelles options en mode avancé
-# Version 2.03 du 24/10/2019 Qui : 5axes  Quoi : Ajout nouvelles options coque / speed et meshfix
-# Version 2.04 du 24/10/2019 Qui : 5axes  Quoi : Ajout CuraVersion
-# Version 2.05 du 24/10/2019 Qui : 5axes  Quoi : Affichage paramètre Extrudeur et pas Global
-# Version 2.06 du 25/10/2019 Qui : 5axes  Quoi : Reduction liste parametre base et ajout distance retraction dans param base
-# Version 3.01 du 07/01/2020 Qui : 5axes  Quoi : Passage au subroutine pour alléger le code
-# Version 4.01 du 15/01/2020 Qui : 5axes  Quoi : Version sans Search and Replace, ajoute à la X eme ligne (Option)
-# Version 4.02 du 16/01/2020 Qui : 5axes  Quoi : Ajout et test double extrusion
-# Version 5.00 du 07/03/2020 Qui : 5axes  Quoi : Ajout info Nombre de couches plus lentes (speed_slowdown_layers)
-# Version 5.01 du 07/03/2020 Qui : 5axes  Quoi : Ajout infos depuis 4.4 meshfix_maximum_resolution / meshfix_maximum_travel_resolution / meshfix_maximum_deviation
-# Version 5.02 du 07/03/2020 Qui : 5axes  Quoi : Passage rétraction sur Travel
-# Version 5.03 du 07/04/2020 Qui : 5axes  Quoi : Ajout infos largeur de ligne
-# Version 5.04 du 07/05/2020 Qui : 5axes  Quoi : Ajout infos débit support et info sur xy_offset  (Version 4.6) 
-# Version 5.1.0 du 09/05/2020 Qui : 5axes  Quoi : Ajout message pour 4.6
+#
+# Description:  This Script add Parameters description in the Header of the G-Code file...
+#               Please look at the option
+#               - Advanced_desc : Advanced description
+#               - extruder_nb   : Specify the extruder nb information to output in case of multi-extruder 
+#                                   you must use as many script as you have some exturder on your machine
+#               - Position      : Position of the Texte in the ISo File : 1 = First line , 2 second line etc ...
+#
+# Version 1.01 of 20/10/2019 Who  : 5axes What : Addition of the names of the parameters with the label
+# Version 1.02 of 21/10/2019 Who  : 5axes What : Addition of new parameters
+# Version 1.03 of 21/10/2019 Who  : 5axes What : Info on material and profile + quality
+# Version 2.00 of 21/10/2019 Who  : 5axes What : Start adding option Advanced settings
+# Version 2.01 of 22/10/2019 Who  : 5axes What : Add option Extruder ID
+# Version 2.02 of 22/10/2019 Who  : 5axes What : Adding new options in advanced mode
+# Version 2.03 of 24/10/2019 Who  : 5axes What : Add new options hull / speed and meshfix
+# Version 2.04 of 24/10/2019 Who  : 5axes What : Add CuraVersion
+# Version 2.05 of 24/10/2019 Who  : 5axes What : Display parameter Extruder and not Global
+# Version 2.06 of 25/10/2019 Who  : 5axes What : Reduction of base parameter list and addition of retraction distance in base parameter
+# Version 3.01 of 07/01/2020 Who  : 5axes What : Switch to subroutine to lighten the code
+# Version 4.01 of 15/01/2020 Who  : 5axes What : Version without Search and Replace, added to the Xth line (Option)
+# Version 4.02 of 16/01/2020 Who  : 5axes What : Addition and double extrusion test
+# Version 5.00 of 07/03/2020 Who  : 5axes What : Add info Number of slower layers (speed_slowdown_layers)
+# Version 5.01 of 07/03/2020 Who  : 5axes What : Add info since 4.4 meshfix_maximum_resolution / meshfix_maximum_travel_resolution / meshfix_maximum_deviation
+# Version 5.02 of 07/03/2020 Who  : 5axes What : Introduce retraction on Travel
+# Version 5.03 of 07/04/2020 Who  : 5axes What : Add line width info
+# Version 5.04 of 07/05/2020 Who  : 5axes What : Adding support flow info and info on xy_offset (Version 4.6) 
+# Version 5.1.0 of 09/05/2020 Who : 5axes What : Add message for 4.6
+#
 #
 import string
 from ..Script import Script
