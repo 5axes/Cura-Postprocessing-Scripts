@@ -143,3 +143,13 @@ FastFirstInfill.py
 Script cura to set a higher filling speed for the first layer.
 
 ![FastFirstInfill.py](./images/fastfirstinfill.jpg)
+	
+
+SlowZ.py
+----
+
+Script cura to reduce the speed according to the print height. 
+	- Slow Z percentage : Positive value to slow the print as the z value rises up to this percentage.
+	- Slow Z height : Positive value to define the start height of the speed reduction.
+
+![SlowZ.py](./images/slowz.jpg)
