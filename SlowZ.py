@@ -106,26 +106,34 @@ class SlowZ(Script):
                
                 if line.startswith(";LAYER_COUNT:"):
                     Logger.log("w", "found LAYER_COUNT %s", line[13:])
-                    layercount=float(line[13:])                    
+                    layercount=int(line[13:])                    
                
                 if is_begin_layer_line(line):
                     line_index = lines.index(line)
-                    # Logger.log('d', 'layer_index : {:d}'.format(layer_index))
+                    
                     # Logger.log('d', 'layer_lines : {}'.format(line))
+                    currentlayer=int(line[7:])
+                    Logger.log('d', 'currentlayer : {:d}'.format(currentlayer))
                     if line.startswith(";LAYER:0"):
+                        currentz=0
                         idl=1
-                    currentlayer=float(line[7:])
+                    
+                    if idl == 1 and currentz >= SlowZHeight:
+                        idl=2
+                        startlayer=currentlayer
+                        # Logger.log("w", "Z Height %f", currentz)
                     
                     #Logger.log("w", "LAYER %s", line[7:])
-                    if idl >= 1 and currentz >= SlowZHeight:
-                        speed_value = 100 - int(float(SlowZPercentage)*(currentlayer/layercount))
+                    if idl >= 2 :
+                        speed_value = 100 - int(float(SlowZPercentage)*((currentlayer-startlayer)/(layercount-startlayer)))
                         lines.insert(2,"M220 S" + str(speed_value))
                 
                 
-                if idl >= 1 and is_z_line(line):
+                if idl == 1 and is_z_line(line):
                     searchZ = re.search(r"Z(\d*\.?\d*)", line)
                     if searchZ:
                         currentz=float(searchZ.group(1))
+                        # Logger.log('d', 'Current Z     : {:f}'.format(currentz))
                         
             result = "\n".join(lines)
             data[layer_index] = result
