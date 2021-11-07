@@ -5,6 +5,7 @@
 # Date:     November 06, 2021
 #
 # Description:  postprocessing script to slowdow the speed according to the Z height
+#               https://marlinfw.org/docs/gcode/M220.html
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 #
@@ -41,18 +42,7 @@ def is_begin_layer_line(line: str) -> bool:
         bool: True if the line is the start of a layer section
     """
     return line.startswith(";LAYER:")
-
-def is_begin_type_line(line: str) -> bool:
-    """Check if current line is the start of a new type section.
-
-    Args:
-        line (str): Gcode line
-
-    Returns:
-        bool: True if the line is the start of a new type section
-    """
-    return line.startswith(";TYPE:")
-    
+  
 def is_z_line(line: str) -> bool:
     """Check if current line is a Z line
 
@@ -63,7 +53,6 @@ def is_z_line(line: str) -> bool:
         bool: True if the line is a Z line segment
     """
     return "G0" in line and "Z" in line and not "E" in line
-    
     
 class SlowZ(Script):
     def __init__(self):
@@ -86,7 +75,7 @@ class SlowZ(Script):
                     "default_value": 0,
                     "minimum_value": "0",
                     "maximum_value_warning": "50"
-                }        
+                },        
                 "slowz_height":
                 {
                     "label": "Slow Z height",
@@ -103,9 +92,11 @@ class SlowZ(Script):
 
         SlowZPercentage = float(self.getSettingValueByKey("slowz_percentage")) 
         SlowZHeight = float(self.getSettingValueByKey("slowz_height")) 
-
+        Logger.log('d', 'SlowZPercentage : {:f}'.format(SlowZPercentage))
+        Logger.log('d', 'SlowZHeight     : {:f}'.format(SlowZHeight))
 
         idl=0
+        currentz=0
         
         for layer in data:
             layer_index = data.index(layer)
@@ -114,8 +105,8 @@ class SlowZ(Script):
             for line in lines:                  
                
                 if line.startswith(";LAYER_COUNT:"):
-                    Logger.log("w", "found LAYER_COUNT %s", fline[13:])
-                    layercount=float(fline[13:])                    
+                    Logger.log("w", "found LAYER_COUNT %s", line[13:])
+                    layercount=float(line[13:])                    
                
                 if is_begin_layer_line(line):
                     line_index = lines.index(line)
@@ -126,18 +117,14 @@ class SlowZ(Script):
                     currentlayer=float(line[7:])
                     speed_value = 100 - int(float(SlowZPercentage)*(currentlayer/layercount))
                     #Logger.log("w", "LAYER %s", line[7:])
-                    lines.insert(2,"M220 S" + str(speed_value))
+                    if currentz >= SlowZHeight:
+                        lines.insert(2,"M220 S" + str(speed_value))
                 
                 
                 if idl >= 1 and is_z_line(line):
-                    searchZ = re.search(r"Z(\d*\.?\d*))", line)
+                    searchZ = re.search(r"Z(\d*\.?\d*)", line)
                     if searchZ:
-                        currentz=float(searchZ.group(1)) 
-                        instructionF="F"+str(searchZ.group(1))
-                        Logger.log('d', 'Current Z       : {:f}'.format(currentz))
-                        # Logger.log('d', 'line : {}'.format(line))
-                        # lines[line_index]=line.replace(instructionF,InfillSpeedInstruction)
-                        lines.insert(2,"M220 S" + str(speed_value))
+                        currentz=float(searchZ.group(1))
                         
             result = "\n".join(lines)
             data[layer_index] = result
