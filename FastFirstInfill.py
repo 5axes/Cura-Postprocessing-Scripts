@@ -108,6 +108,17 @@ def is_reset_extruder_line(line: str) -> bool:
     """
     return "G92" in line and "E0" in line
 
+def is_begin_skin_segment_line(line: str) -> bool:
+    """Check if current line is the start of an skin.
+
+    Args:
+        line (str): Gcode line
+
+    Returns:
+        bool: True if the line is the start of an skin section
+    """
+    return line.startswith(";TYPE:SKIN")
+    
 class FastFirstInfill(Script):
     def __init__(self):
         super().__init__()
@@ -137,6 +148,7 @@ class FastFirstInfill(Script):
     def execute(self, data):
 
         InfillSpeed = float(self.getSettingValueByKey("infillspeed")) * 60
+        InfillSpeedInstruction = "F" + str(InfillSpeed)
 
         idl=0
         
@@ -150,24 +162,28 @@ class FastFirstInfill(Script):
                     line_index = lines.index(line)
 
                     Logger.log('d', 'layer_index : {:d}'.format(layer_index))
+                    Logger.log('d', 'layer_lines : {}'.format(line))
                     
-                    if (layer_index==1):
+                    if (layer_index==2):
                         idl=1
                     else :
                         idl=0
                 
-                if line.startswith(";TYPE") and idl >= 0:
+                if line.startswith(";TYPE") and idl > 0:
                     if line.startswith(";TYPE:SKIN"):
                         idl=2
                     else :
                         idl=1
                 
                 if idl >= 2 and is_extrusion_line(line):
-                    searchF = re.search(r"F([-+]?\d*\.?\d*)", line)
+                    searchF = re.search(r"F(\d*\.?\d*)", line)
                     if searchF:
-                        save_F=float(searchF.group(1))     
-                        Logger.log('d', 'layer_index : {:d}'.format(save_F))
-            
+                        save_F=float(searchF.group(1)) 
+                        instructionF="F"+str(searchF.group(1))
+                        Logger.log('d', 'save_F       : {:f}'.format(save_F))
+                        Logger.log('d', 'instructionF : {}'.format(instructionF))
+                        line.replace(instructionF,InfillSpeedInstruction)
+                        
             result = "\n".join(lines)
             data[layer_index] = result
 
