@@ -115,9 +115,10 @@ class SlowZ(Script):
                     if line.startswith(";LAYER:0"):
                         idl=1
                     currentlayer=float(line[7:])
-                    speed_value = 100 - int(float(SlowZPercentage)*(currentlayer/layercount))
+                    
                     #Logger.log("w", "LAYER %s", line[7:])
-                    if currentz >= SlowZHeight:
+                    if idl >= 1 and currentz >= SlowZHeight:
+                        speed_value = 100 - int(float(SlowZPercentage)*(currentlayer/layercount))
                         lines.insert(2,"M220 S" + str(speed_value))
                 
                 
