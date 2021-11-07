@@ -135,3 +135,11 @@ InsertAtLayerChange.py
 ----
 
 Modification of the official script with Layer Increment.
+	
+
+FastFirstInfill.py
+----
+
+Script cura to set a higher filling speed for the first layer.
+
+![FastFirstInfill.py](./images/fastfirstinfill.jpg)
