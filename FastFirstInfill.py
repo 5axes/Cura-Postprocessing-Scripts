@@ -43,6 +43,17 @@ def is_begin_layer_line(line: str) -> bool:
     """
     return line.startswith(";LAYER:")
 
+def is_begin_type_line(line: str) -> bool:
+    """Check if current line is the start of a new type section.
+
+    Args:
+        line (str): Gcode line
+
+    Returns:
+        bool: True if the line is the start of a new type section
+    """
+    return line.startswith(";TYPE:")
+    
 def is_retract_line(line: str) -> bool:
     """Check if current line is a retract segment.
 
@@ -75,39 +86,6 @@ def is_not_extrusion_line(line: str) -> bool:
         bool: True if the line is a standard printing segment
     """
     return "G0" in line and "X" in line and "Y" in line and not "E" in line
-
-def is_relative_instruction_line(line: str) -> bool:
-    """Check if current line contain a M83 / G91 instruction
-
-    Args:
-        line (str): Gcode line
-
-    Returns:
-        bool: True contain a M83 / G91 instruction
-    """
-    return "G91" in line or "M83" in line
-
-def is_not_relative_instruction_line(line: str) -> bool:
-    """Check if current line contain a M82 / G90 instruction
-
-    Args:
-        line (str): Gcode line
-
-    Returns:
-        bool: True contain a M82 / G90 instruction
-    """
-    return "G90" in line or "M82" in line
-
-def is_reset_extruder_line(line: str) -> bool:
-    """Check if current line contain a G92 E0
-
-    Args:
-        line (str): Gcode line
-
-    Returns:
-        bool: True contain a G92 E0 instruction
-    """
-    return "G92" in line and "E0" in line
 
 def is_begin_skin_segment_line(line: str) -> bool:
     """Check if current line is the start of an skin.
@@ -160,17 +138,16 @@ class FastFirstInfill(Script):
             lines = layer.split("\n")
             for line in lines:                  
                
-                if line.startswith(";LAYER:"):
+                if is_begin_layer_line(line):
                     # Logger.log('d', 'layer_index : {:d}'.format(layer_index))
                     # Logger.log('d', 'layer_lines : {}'.format(line))
-                    
                     if line.startswith(";LAYER:0"):
                         idl=1
                     else :
                         idl=0
                 
-                if line.startswith(";TYPE") and idl > 0:
-                    if line.startswith(";TYPE:SKIN"):
+                if is_begin_type_line(line) and idl > 0:
+                    if is_begin_skin_segment_line(line):
                         idl=2
                         Logger.log('d', 'layer_lines : {}'.format(line))
                     else :
