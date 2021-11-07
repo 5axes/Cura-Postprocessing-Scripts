@@ -153,5 +153,7 @@ Script cura to reduce the speed according to the print height.
 	- Slow Z percentage : Positive value to slow the print as the z value rises up to this percentage.
 	
 	- Slow Z height : Positive value to define the start height of the speed reduction.
+	
+	- Display details on LCD : This setting will insert M117 gcode instructions, to display current modification in the G-Code is being used.
 
 ![SlowZ.py](./images/slowz.jpg)
