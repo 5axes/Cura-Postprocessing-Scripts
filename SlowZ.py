@@ -19,7 +19,7 @@ from UM.Application import Application
 import re #To perform the search
 from enum import Enum
 
-__version__ = '1.1'
+__version__ = '1.0'
 
 class Section(Enum):
     """Enum for section type."""
