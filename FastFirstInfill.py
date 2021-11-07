@@ -149,7 +149,7 @@ class FastFirstInfill(Script):
                 if line.startswith(";LAYER:"):
                     line_index = lines.index(line)
 
-                    Logger.log('d', 'layer_index : {%d}'.format(layer_index))
+                    Logger.log('d', 'layer_index : {:d}'.format(layer_index))
                     
                     if (layer_index==1):
                         idl=1
@@ -166,7 +166,7 @@ class FastFirstInfill(Script):
                     searchF = re.search(r"F([-+]?\d*\.?\d*)", line)
                     if searchF:
                         save_F=float(searchF.group(1))     
-                        Logger.log('d', 'layer_index : {%save_F}'.format(save_F))
+                        Logger.log('d', 'layer_index : {:d}'.format(save_F))
             
             result = "\n".join(lines)
             data[layer_index] = result
