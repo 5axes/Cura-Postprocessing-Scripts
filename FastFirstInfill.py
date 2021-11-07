@@ -4,11 +4,11 @@
 # Author:   5axes
 # Date:     November 06, 2021
 #
-# Description:  postprocessing script to modifiy FastFirstInfill 
+# Description:  postprocessing script to modifiy the first layer infill 
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 #
-#   Version 1.0 29/02/2020
+#   Version 1.0 06/11/2021
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -133,14 +133,14 @@ class FastFirstInfill(Script):
             {
                 "infillspeed":
                 {
-                    "label": "Infill speed",
-                    "description": "Infill speed value.",
+                    "label": "First layer infill speed",
+                    "description": "First layer infill speed value.",
                     "type": "float",
                     "unit": "mm/s",
                     "default_value": 30,
                     "minimum_value": 1,
                     "maximum_value": 100,
-                    "maximum_value_warning": 30
+                    "maximum_value_warning": 50
                 }              
             }
         }"""
@@ -149,6 +149,7 @@ class FastFirstInfill(Script):
 
         InfillSpeed = float(self.getSettingValueByKey("infillspeed")) * 60
         InfillSpeedInstruction = "F" + str(InfillSpeed)
+        Logger.log('d', 'InfillSpeedInstruction : {}'.format(InfillSpeedInstruction))
 
         idl=0
         
@@ -159,10 +160,8 @@ class FastFirstInfill(Script):
             for line in lines:                  
                
                 if line.startswith(";LAYER:"):
-                    line_index = lines.index(line)
-
-                    Logger.log('d', 'layer_index : {:d}'.format(layer_index))
-                    Logger.log('d', 'layer_lines : {}'.format(line))
+                    # Logger.log('d', 'layer_index : {:d}'.format(layer_index))
+                    # Logger.log('d', 'layer_lines : {}'.format(line))
                     
                     if (layer_index==2):
                         idl=1
@@ -172,17 +171,20 @@ class FastFirstInfill(Script):
                 if line.startswith(";TYPE") and idl > 0:
                     if line.startswith(";TYPE:SKIN"):
                         idl=2
+                        Logger.log('d', 'layer_lines : {}'.format(line))
                     else :
                         idl=1
                 
                 if idl >= 2 and is_extrusion_line(line):
                     searchF = re.search(r"F(\d*\.?\d*)", line)
                     if searchF:
+                        line_index = lines.index(line)
                         save_F=float(searchF.group(1)) 
                         instructionF="F"+str(searchF.group(1))
-                        Logger.log('d', 'save_F       : {:f}'.format(save_F))
-                        Logger.log('d', 'instructionF : {}'.format(instructionF))
-                        line.replace(instructionF,InfillSpeedInstruction)
+                        # Logger.log('d', 'save_F       : {:f}'.format(save_F))
+                        # Logger.log('d', 'line : {}'.format(line))
+                        # Logger.log('d', 'line replace : {}'.format(line.replace(instructionF,InfillSpeedInstruction)))
+                        lines[line_index]=line.replace(instructionF,InfillSpeedInstruction)
                         
             result = "\n".join(lines)
             data[layer_index] = result
