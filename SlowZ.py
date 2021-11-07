@@ -69,12 +69,13 @@ class SlowZ(Script):
                 "slowz_percentage":
                 {
                     "label": "Slow Z percentage",
-                    "description": "Positive value to slow the print as the z value rises up to 50 percent.",
+                    "description": "Positive value to slow the print as the z value rises up to this percentage.",
                     "type": "float",
                     "unit": "%",
                     "default_value": 0,
                     "minimum_value": "0",
-                    "maximum_value_warning": "50"
+                    "maximum_value_warning": "50",
+                    "maximum_value": "90"
                 },        
                 "slowz_height":
                 {
@@ -84,16 +85,24 @@ class SlowZ(Script):
                     "unit": "mm",
                     "default_value": 0,
                     "minimum_value": "0"
-                }                     
+                },
+                "lcdfeedback":
+                {
+                    "label": "Display details on LCD",
+                    "description": "This setting will insert M117 gcode instructions, to display current modification in the G-Code is being used.",
+                    "type": "bool",
+                    "default_value": true
+                }                      
             }
         }"""
 
     def execute(self, data):
 
         SlowZPercentage = float(self.getSettingValueByKey("slowz_percentage")) 
-        SlowZHeight = float(self.getSettingValueByKey("slowz_height")) 
-        Logger.log('d', 'SlowZPercentage : {:f}'.format(SlowZPercentage))
-        Logger.log('d', 'SlowZHeight     : {:f}'.format(SlowZHeight))
+        SlowZHeight = float(self.getSettingValueByKey("slowz_height"))
+        UseLcd = self.getSettingValueByKey("lcdfeedback")
+        # Logger.log('d', 'SlowZPercentage : {:f}'.format(SlowZPercentage))
+        # Logger.log('d', 'SlowZHeight     : {:f}'.format(SlowZHeight))
 
         idl=0
         currentz=0
@@ -105,7 +114,7 @@ class SlowZ(Script):
             for line in lines:                  
                
                 if line.startswith(";LAYER_COUNT:"):
-                    Logger.log("w", "found LAYER_COUNT %s", line[13:])
+                    # Logger.log("w", "found LAYER_COUNT %s", line[13:])
                     layercount=int(line[13:])                    
                
                 if is_begin_layer_line(line):
@@ -113,7 +122,7 @@ class SlowZ(Script):
                     
                     # Logger.log('d', 'layer_lines : {}'.format(line))
                     currentlayer=int(line[7:])
-                    Logger.log('d', 'currentlayer : {:d}'.format(currentlayer))
+                    # Logger.log('d', 'currentlayer : {:d}'.format(currentlayer))
                     if line.startswith(";LAYER:0"):
                         currentz=0
                         idl=1
@@ -127,6 +136,9 @@ class SlowZ(Script):
                     if idl >= 2 :
                         speed_value = 100 - int(float(SlowZPercentage)*((currentlayer-startlayer)/(layercount-startlayer)))
                         lines.insert(2,"M220 S" + str(speed_value))
+                        if UseLcd == True :
+                            lcd_gcode = "M117 Speed {:d}%".format(int(speed_value))
+                            lines.insert(3,lcd_gcode)
                 
                 
                 if idl == 1 and is_z_line(line):
