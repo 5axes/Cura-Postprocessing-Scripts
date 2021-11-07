@@ -9,6 +9,7 @@
 #------------------------------------------------------------------------------------------------------------------------------------
 #
 #   Version 1.0 06/11/2021
+#   Version 1.1 07/11/2021 Modification pour Print Sequence
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +19,7 @@ from UM.Application import Application
 import re #To perform the search
 from enum import Enum
 
-__version__ = '1.0'
+__version__ = '1.1'
 
 class Section(Enum):
     """Enum for section type."""
@@ -163,7 +164,7 @@ class FastFirstInfill(Script):
                     # Logger.log('d', 'layer_index : {:d}'.format(layer_index))
                     # Logger.log('d', 'layer_lines : {}'.format(line))
                     
-                    if (layer_index==2):
+                    if line.startswith(";LAYER:0"):
                         idl=1
                     else :
                         idl=0
