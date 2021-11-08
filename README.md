@@ -143,8 +143,19 @@ FastFirstInfill.py
 Script cura to set a higher filling speed for the first layer.
 
 ![FastFirstInfill.py](./images/fastfirstinfill.jpg)
-	
 
+	
+Original first layer speed before modification
+	
+	
+![First layer speed](./images/origine.png)
+
+First layer speed after modification with the script.
+	
+	
+![First layer speed after modification](./images/result.png)
+	
+	
 SlowZ.py
 ----
 
@@ -158,4 +169,4 @@ Script cura to reduce the speed according to the print height.
 	
 	- Display details on LCD : This setting will insert M117 gcode instructions, to display current modification in the G-Code is being used.
 
-![SlowZ.py](./images/slowzsettings.jpg)
+![SlowZ settings](./images/slowzsettings.jpg)
