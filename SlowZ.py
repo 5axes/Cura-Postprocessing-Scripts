@@ -2,9 +2,9 @@
 #
 # Cura PostProcessing Script
 # Author:   5axes
-# Date:     November 06, 2021
+# Date:     November 07, 2021
 #
-# Description:  postprocessing script to slowdow the speed according to the Z height
+# Description:  postprocessing script to slowdown the speed according to the Z height
 #               https://marlinfw.org/docs/gcode/M220.html
 #
 #------------------------------------------------------------------------------------------------------------------------------------
