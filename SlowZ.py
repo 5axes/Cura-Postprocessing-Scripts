@@ -118,8 +118,7 @@ class SlowZ(Script):
                     layercount=int(line[13:])                    
                
                 if is_begin_layer_line(line):
-                    line_index = lines.index(line)
-                    
+                    line_index = lines.index(line)    
                     # Logger.log('d', 'layer_lines : {}'.format(line))
                     currentlayer=int(line[7:])
                     # Logger.log('d', 'currentlayer : {:d}'.format(currentlayer))
