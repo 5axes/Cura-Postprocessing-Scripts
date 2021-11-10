@@ -17,8 +17,12 @@ from UM.Logger import Logger
 from UM.Application import Application
 import re #To perform the search
 from enum import Enum
+from collections import namedtuple
+from typing import List, Tuple
 
 __version__ = '1.0'
+
+Point2D = namedtuple('Point2D', 'x y')
 
 class Section(Enum):
     """Enum for section type."""
@@ -43,16 +47,16 @@ def is_begin_layer_line(line: str) -> bool:
     """
     return line.startswith(";LAYER:")
 
-def is_begin_brim_line(line: str) -> bool:
-    """Check if current line is the start of a brim section.
+def is_begin_skirt_line(line: str) -> bool:
+    """Check if current line is the start of a SKIRT section.
 
     Args:
         line (str): Gcode line
 
     Returns:
-        bool: True if the line is the start of a brim section
+        bool: True if the line is the start of a SKIRT section
     """
-    return line.startswith(";TYPE:BRIM")
+    return line.startswith(";TYPE:SKIRT")
 
 def is_begin_type_line(line: str) -> bool:
     """Check if current line is the start of a type section.
@@ -64,6 +68,18 @@ def is_begin_type_line(line: str) -> bool:
         bool: True if the line is the start of a type section
     """
     return line.startswith(";TYPE")
+
+def is_begin_mesh_line(line: str) -> bool:
+    """Check if current line is the start of a new MESH.
+
+    Args:
+        line (str): Gcode line
+
+    Returns:
+        bool: True if the line is the start of a new MESH
+    """
+    return line.startswith(";MESH:")
+
     
 def is_z_line(line: str) -> bool:
     """Check if current line is a Z line
@@ -75,6 +91,28 @@ def is_z_line(line: str) -> bool:
         bool: True if the line is a Z line segment
     """
     return "G0" in line and "Z" in line and not "E" in line
+
+def getXY(currentLine: str) -> Point2D:
+    """Create a ``Point2D`` object from a gcode line.
+
+    Args:
+        currentLine (str): gcode line
+
+    Raises:
+        SyntaxError: when the regular expressions cannot find the relevant coordinates in the gcode
+
+    Returns:
+        Point2D: the parsed coordinates
+    """
+    searchX = re.search(r"X(\d*\.?\d*)", currentLine)
+    searchY = re.search(r"Y(\d*\.?\d*)", currentLine)
+    if searchX and searchY:
+        elementX = searchX.group(1)
+        elementY = searchY.group(1)
+    else:
+        raise SyntaxError('Gcode file parsing error for line {currentLine}')
+
+    return Point2D(float(elementX), float(elementY))
     
 class MultiBrim(Script):
     def __init__(self):
@@ -106,6 +144,9 @@ class MultiBrim(Script):
         BrimMultiply = int(self.getSettingValueByKey("multiply")) 
 
         idl=0
+        lines_brim =[]
+        startline=''
+        nb_line=0
         
         for layer in data:
             layer_index = data.index(layer)
@@ -124,22 +165,36 @@ class MultiBrim(Script):
                     # Logger.log('d', 'currentlayer : {:d}'.format(currentlayer))
                     if line.startswith(";LAYER:0"):
                         idl=1
+                    elif currentlayer <= BrimMultiply :
+                        Logger.log('d', 'Insert here : {:d}'.format(currentlayer))
+                        line_index = lines.index(line)
+                        lines.insert(line_index + 1, "G92 E0")
+                        lines.insert(line_index + 2, startline)
+
+ 
+                if idl == 2 and is_begin_type_line(line):
+                    idl == 0
                     
-                    if idl == 1 and is_begin_brim_line(line):
-                        idl=2
-                        startlayer=currentlayer
-                        lines_brim.insert(1,line)
-                        nb_line=2
-                        # Logger.log("w", "Z Height %f", currentz)
-                    
-                    if idl == 2 and is_begin_type_line(line):
-                        idl == 1
-                        for aline in lines_brim:
-                            Logger.log('d', 'brim_lines : {}'.format(aline))
-                    else :
-                        lines_brim.insert(nb_line,line)
-                        nb_line+=1
-                
+                if idl == 2 and is_begin_mesh_line(line) :
+                    idl = 0
+                    Logger.log('d', 'mesh_lines : {}'.format(line))
+                    Logger.log('d', 'nb_line    : {:d}'.format(nb_line))
+                    # for aline in lines_brim:
+                    #     Logger.log('d', 'brim_lines : {}'.format(aline))
+                        
+                if idl == 2 :
+                    lines_brim.append(line)
+                    nb_line+=1
+ 
+                if idl == 1 and is_begin_skirt_line(line):
+                    idl=2
+                    line_index = lines.index(line)
+                    startline=lines(line_index)
+                    lines_brim =[]
+                    startlayer=currentlayer
+                    lines_brim.append(line)
+                    nb_line=1
+                    # Logger.log("w", "Z Height %f", currentz) 
                 
                         
             result = "\n".join(lines)
