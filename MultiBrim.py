@@ -8,7 +8,7 @@
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 #
-#   Version 1.0 10/11/2021 first prototype
+#   Version 1.0 10/11/2021 first prototype right now must be use with the relative extrusion activated and no 
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -146,7 +146,10 @@ class MultiBrim(Script):
         idl=0
         lines_brim =[]
         startline=''
+        firstz=''
+        xyline=''
         nb_line=0
+        currentlayer=0
         
         for layer in data:
             layer_index = data.index(layer)
@@ -167,16 +170,22 @@ class MultiBrim(Script):
                         idl=1
                     elif currentlayer <= BrimMultiply :
                         Logger.log('d', 'Insert Here : {:d}'.format(currentlayer))
-                        Logger.log('d', 'First   Z   : { }'.format(firstz))
+                        Logger.log('d', 'First   Z   : {}'.format(firstz))
                         line_index = lines.index(line)
+                        xyline=lines[line_index-3]
+                        Logger.log('d', 'xyline   : {}'.format(xyline))
                         lines.insert(line_index + 1, "G92 E0")
-                        lines.insert(line_index + 2, startline)
+                        ModiZ="Z"+str(currentz)
+                        BeginLine=startline.replace(firstz, ModiZ)
+                        lines.insert(line_index + 2, BeginLine)
                         nb_line=2
                         for aline in lines_brim:
                             nb_line+=1
                             lines.insert(line_index + nb_line, aline)
                         nb_line+=1
-                        lines.insert(line_index + nb_line, ";ENDOFMODI)
+                        lines.insert(line_index + nb_line, xyline)
+                        nb_line+=1
+                        lines.insert(line_index + nb_line, ";END_OF_MODIFICATION")
      
                 if idl == 2 and is_begin_type_line(line):
                     idl == 0
@@ -202,6 +211,10 @@ class MultiBrim(Script):
                     lines_brim.append(line)
                     # Logger.log("w", "Z Height %f", currentz) 
                 
+                if currentlayer <= BrimMultiply and is_z_line(line):
+                    searchZ = re.search(r"Z(\d*\.?\d*)", line)
+                    if searchZ:
+                        currentz=float(searchZ.group(1))
                         
             result = "\n".join(lines)
             data[layer_index] = result
