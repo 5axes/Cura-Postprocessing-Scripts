@@ -8,7 +8,7 @@
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 #
-#   Version 1.0 10/11/2021 first prototype right now must be use with the relative extrusion activated and no 
+#   Version 1.0 10/11/2021 first prototype right now must be use with the relative extrusion activated and no Zhop
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -92,6 +92,17 @@ def is_z_line(line: str) -> bool:
     """
     return "G0" in line and "Z" in line and not "E" in line
 
+def is_only_extrusion_line(line: str) -> bool:
+    """Check if current line is a pure extrusion command.
+
+    Args:
+        line (str): Gcode line
+
+    Returns:
+        bool: True if the line is a pure extrusion command
+    """
+    return "G1" in line and not "X" in line and not "Y" in line and "E" in line
+    
 def getXY(currentLine: str) -> Point2D:
     """Create a ``Point2D`` object from a gcode line.
 
@@ -181,7 +192,16 @@ class MultiBrim(Script):
                         nb_line=2
                         for aline in lines_brim:
                             nb_line+=1
-                            lines.insert(line_index + nb_line, aline)
+                            searchZ = re.search(r"Z(\d*\.?\d*)", aline)
+                            if searchZ:
+                                cz="Z"+searchZ.group(1)
+                                ModiZ="Z"+str(currentz)
+                                Logger.log('d', 'Current Z   : {}'.format(cz))
+                                Logger.log('d', 'Modi    Z   : {}'.format(ModiZ))
+                                InsertLine=aline.replace(cz, ModiZ)
+                            else:
+                                InsertLine=aline
+                            lines.insert(line_index + nb_line, InsertLine)
                         nb_line+=1
                         lines.insert(line_index + nb_line, xyline)
                         nb_line+=1
@@ -194,7 +214,8 @@ class MultiBrim(Script):
                     idl = 0
                         
                 if idl == 2 :
-                    lines_brim.append(line)
+                    if not is_only_extrusion_line(line):
+                        lines_brim.append(line)
                     
  
                 if idl == 1 and is_begin_skirt_line(line):
