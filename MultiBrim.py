@@ -166,34 +166,40 @@ class MultiBrim(Script):
                     if line.startswith(";LAYER:0"):
                         idl=1
                     elif currentlayer <= BrimMultiply :
-                        Logger.log('d', 'Insert here : {:d}'.format(currentlayer))
+                        Logger.log('d', 'Insert Here : {:d}'.format(currentlayer))
+                        Logger.log('d', 'First   Z   : { }'.format(firstz))
                         line_index = lines.index(line)
                         lines.insert(line_index + 1, "G92 E0")
                         lines.insert(line_index + 2, startline)
-
- 
+                        nb_line=2
+                        for aline in lines_brim:
+                            nb_line+=1
+                            lines.insert(line_index + nb_line, aline)
+                        nb_line+=1
+                        lines.insert(line_index + nb_line, ";ENDOFMODI)
+     
                 if idl == 2 and is_begin_type_line(line):
                     idl == 0
                     
                 if idl == 2 and is_begin_mesh_line(line) :
                     idl = 0
-                    Logger.log('d', 'mesh_lines : {}'.format(line))
-                    Logger.log('d', 'nb_line    : {:d}'.format(nb_line))
-                    # for aline in lines_brim:
-                    #     Logger.log('d', 'brim_lines : {}'.format(aline))
                         
                 if idl == 2 :
                     lines_brim.append(line)
-                    nb_line+=1
+                    
  
                 if idl == 1 and is_begin_skirt_line(line):
                     idl=2
-                    line_index = lines.index(line)
-                    startline=lines(line_index)
+                    line_index = lines.index(line)-1
+                    startline=lines[line_index]
+                    searchZ = re.search(r"Z(\d*\.?\d*)", startline)
+                    if searchZ:
+                        startz=float(searchZ.group(1))
+                        firstz="Z"+searchZ.group(1)
+                        
                     lines_brim =[]
                     startlayer=currentlayer
                     lines_brim.append(line)
-                    nb_line=1
                     # Logger.log("w", "Z Height %f", currentz) 
                 
                         
