@@ -196,8 +196,8 @@ class MultiBrim(Script):
                             if searchZ:
                                 cz="Z"+searchZ.group(1)
                                 ModiZ="Z"+str(currentz)
-                                Logger.log('d', 'Current Z   : {}'.format(cz))
-                                Logger.log('d', 'Modi    Z   : {}'.format(ModiZ))
+                                # Logger.log('d', 'Current Z   : {}'.format(cz))
+                                # Logger.log('d', 'Modi    Z   : {}'.format(ModiZ))
                                 InsertLine=aline.replace(cz, ModiZ)
                             else:
                                 InsertLine=aline
@@ -217,7 +217,6 @@ class MultiBrim(Script):
                     if not is_only_extrusion_line(line):
                         lines_brim.append(line)
                     
- 
                 if idl == 1 and is_begin_skirt_line(line):
                     idl=2
                     line_index = lines.index(line)-1
