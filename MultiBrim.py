@@ -179,12 +179,15 @@ class MultiBrim(Script):
                     # Logger.log('d', 'currentlayer : {:d}'.format(currentlayer))
                     if line.startswith(";LAYER:0"):
                         idl=1
+                    
+                    # Copy the Original Brim
                     elif currentlayer <= BrimMultiply :
-                        Logger.log('d', 'Insert Here : {:d}'.format(currentlayer))
-                        Logger.log('d', 'First   Z   : {}'.format(firstz))
+                        # Logger.log('d', 'Insert Here : {:d}'.format(currentlayer))
+                        # Logger.log('d', 'First   Z   : {}'.format(firstz))
                         line_index = lines.index(line)
                         xyline=lines[line_index-3]
-                        Logger.log('d', 'xyline   : {}'.format(xyline))
+                        # Logger.log('d', 'xyline   : {}'.format(xyline))
+                        #Reset the Extruder position
                         lines.insert(line_index + 1, "G92 E0")
                         ModiZ="Z"+str(currentz)
                         BeginLine=startline.replace(firstz, ModiZ)
