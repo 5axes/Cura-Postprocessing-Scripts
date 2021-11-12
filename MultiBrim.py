@@ -12,6 +12,7 @@
 #   Version 1.1 11/11/2021 first prototype tested on Ender3
 #   Version 1.2 12/11/2021 Adding Speed value for the subsequent brim print Zhop are still not managed
 #   Version 1.3 12/11/2021 ZHop management
+#   Version 1.4 12/11/2021 Manage Retract
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -23,7 +24,7 @@ from enum import Enum
 from collections import namedtuple
 from typing import List, Tuple
 
-__version__ = '1.3'
+__version__ = '1.4'
 
 Point2D = namedtuple('Point2D', 'x y')
 
@@ -193,7 +194,11 @@ class MultiBrim(Script):
         xyline=''
         nb_line=0
         currentlayer=0
+        CurrentE=0
+        RetractE=0
+        ResetE=0
         lastE='G92 E0'
+        RetractF=3000
         
         for layer in data:
             layer_index = data.index(layer)
@@ -223,16 +228,24 @@ class MultiBrim(Script):
                         #----------------------------
                         #    Begin of modification
                         #----------------------------
-                        lines.insert(line_index + 1, ";BEGIN_OF_MODIFICATION")
+                        nb_line = 1
+                        lines.insert(line_index + nb_line, ";BEGIN_OF_MODIFICATION")
                         # Logger.log('d', 'xyline   : {}'.format(xyline))
                         # Reset the Extruder position
-                        lines.insert(line_index + 2, "G92 E0")
+                        if RetractE >0 :
+                            nb_line+=1
+                            lines.insert(line_index + nb_line, "G1 F" + str(RetractF) +  " E" + str(ResetE) )
+                        
+                        nb_line+=1
+                        lines.insert(line_index + nb_line, "G92 E0")
                         DecZ = FirstBrimZ
                         BrimZ += StartZ
                         ModiZ="Z"+str(BrimZ)
                         BeginLine=startline.replace(FirstZ, ModiZ)
-                        lines.insert(line_index + 3, BeginLine)
-                        nb_line=3
+                        
+                        nb_line+=1
+                        lines.insert(line_index + nb_line, BeginLine)
+
                         for aline in lines_brim:
                             nb_line+=1
                             searchZ = re.search(r"Z(\d*\.?\d*)", aline)
@@ -318,7 +331,13 @@ class MultiBrim(Script):
                     searchE = re.search(r"E([-+]?\d*\.?\d*)", line)
                     if searchE:
                         lastE="G92 E"+searchE.group(1)
-
+                        RetractE=CurrentE-float(searchE.group(1))
+                        ResetE=CurrentE
+                        CurrentE=float(searchE.group(1))
+                    
+                        searchF = re.search(r"F(\d*\.?\d*)", line)
+                        if searchF:
+                            RetractF=float(searchF.group(1))
                         
             result = "\n".join(lines)
             data[layer_index] = result
