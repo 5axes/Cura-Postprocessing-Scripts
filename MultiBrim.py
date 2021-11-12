@@ -10,6 +10,7 @@
 #
 #   Version 1.0 10/11/2021 first prototype right now must be use with the relative extrusion activated and no Zhop
 #   Version 1.1 11/11/2021 first prototype tested on Ender3
+#   Version 1.2 12/11/2021 Adding Speed value for the subsequent brim print
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +22,7 @@ from enum import Enum
 from collections import namedtuple
 from typing import List, Tuple
 
-__version__ = '1.1'
+__version__ = '1.2'
 
 Point2D = namedtuple('Point2D', 'x y')
 
@@ -153,24 +154,40 @@ class MultiBrim(Script):
                 "multiply":
                 {
                     "label": "Brim multiply",
-                    "description": "Number of Brim to Multiply",
+                    "description": "Number of brim to multiply",
                     "type": "int",
                     "default_value": 2,
                     "minimum_value": "1",
                     "maximum_value_warning": "3",
                     "maximum_value": "5"
-                }                 
+                },
+                "speed":
+                {
+                    "label": "Brim speed",
+                    "description": "Speed for the subsequent brim",
+                    "type": "float",
+                    "unit": "mm/s",
+                    "default_value": 30,
+                    "minimum_value": "0",
+                    "maximum_value_warning": "50",
+                    "maximum_value": "100"
+                }                
             }
         }"""
 
     def execute(self, data):
 
         BrimMultiply = int(self.getSettingValueByKey("multiply")) 
+        BrimSpeed = int(self.getSettingValueByKey("speed"))*60
+        BrimReplaceSpeeed = "F" + str(BrimSpeed)        
 
         idl=0
         lines_brim =[]
         startline=''
-        firstz=''
+        BrimF='F0'
+        FirstZ=''
+        StartZ=0
+        BrimZ=0
         xyline=''
         nb_line=0
         currentlayer=0
@@ -197,7 +214,7 @@ class MultiBrim(Script):
                     # Copy the Original Brim
                     elif currentlayer <= BrimMultiply :
                         # Logger.log('d', 'Insert Here : {:d}'.format(currentlayer))
-                        # Logger.log('d', 'First   Z   : {}'.format(firstz))
+                        # Logger.log('d', 'First   Z   : {}'.format(FirstZ))
                         line_index = lines.index(line)
                         xyline=lines[line_index-3]
                         
@@ -208,8 +225,9 @@ class MultiBrim(Script):
                         # Logger.log('d', 'xyline   : {}'.format(xyline))
                         # Reset the Extruder position
                         lines.insert(line_index + 2, "G92 E0")
-                        ModiZ="Z"+str(currentz)
-                        BeginLine=startline.replace(firstz, ModiZ)
+                        BrimZ+=StartZ
+                        ModiZ="Z"+str(BrimZ)
+                        BeginLine=startline.replace(FirstZ, ModiZ)
                         lines.insert(line_index + 3, BeginLine)
                         nb_line=3
                         for aline in lines_brim:
@@ -237,24 +255,40 @@ class MultiBrim(Script):
                         lines.insert(line_index + nb_line, ";END_OF_MODIFICATION")
      
                 if idl == 2 and is_begin_type_line(line):
-                    idl == 0
+                    idl = 0
                     
                 if idl == 2 and is_begin_mesh_line(line) :
                     idl = 0
-                        
+                
+                #---------------------------------------
+                # Add the Brim line to the brim path 
+                #---------------------------------------                
                 if idl == 2 :
                     # if not is_only_extrusion_line(line):
-                    lines_brim.append(line)
-                 
+                    if BrimSpeed >0 :
+                            cline = line.replace(BrimF,BrimReplaceSpeeed)
+                    else :
+                            cline = line
+                    lines_brim.append(cline)
+                
+                #---------------------------------------
                 # Init copy of the BRIM extruding path
+                #---------------------------------------
                 if idl == 1 and is_begin_skirt_line(line):
                     idl=2
                     line_index = lines.index(line)-1
                     startline=lines[line_index]
                     searchZ = re.search(r"Z(\d*\.?\d*)", startline)
                     if searchZ:
-                        startz=float(searchZ.group(1))
-                        firstz="Z"+searchZ.group(1)
+                        StartZ=float(searchZ.group(1))
+                        FirstZ="Z"+searchZ.group(1)
+                    
+                    speedline=lines[line_index+3]
+                    Logger.log('d', 'speedline   : {}'.format(speedline))
+                    searchF = re.search(r"F(\d*\.?\d*)", speedline)
+                    if searchF:
+                        BrimF="F"+searchF.group(1)                    
+                        Logger.log('d', 'BrimF     : {}'.format(BrimF))
                         
                     lines_brim =[]
                     startlayer=currentlayer
