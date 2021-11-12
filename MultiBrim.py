@@ -92,6 +92,18 @@ def is_z_line(line: str) -> bool:
     """
     return "G0" in line and "Z" in line and not "E" in line
 
+def is_e_line(line: str) -> bool:
+    """Check if current line is a an Extruder line
+
+    Args:
+        line (str): Gcode line
+
+    Returns:
+        bool: True if the line is an Extruder line segment
+    """
+    return "G0" in line  and "E" in line
+    
+    
 def is_only_extrusion_line(line: str) -> bool:
     """Check if current line is a pure extrusion command.
 
@@ -161,6 +173,7 @@ class MultiBrim(Script):
         xyline=''
         nb_line=0
         currentlayer=0
+        lastE='G92 E0'
         
         for layer in data:
             layer_index = data.index(layer)
@@ -186,13 +199,18 @@ class MultiBrim(Script):
                         # Logger.log('d', 'First   Z   : {}'.format(firstz))
                         line_index = lines.index(line)
                         xyline=lines[line_index-3]
+                        
+                        #----------------------------
+                        #    Begin of modification
+                        #----------------------------
+                        lines.insert(line_index + 1, ";BEGIN_OF_MODIFICATION")
                         # Logger.log('d', 'xyline   : {}'.format(xyline))
-                        #Reset the Extruder position
-                        lines.insert(line_index + 1, "G92 E0")
+                        # Reset the Extruder position
+                        lines.insert(line_index + 2, "G92 E0")
                         ModiZ="Z"+str(currentz)
                         BeginLine=startline.replace(firstz, ModiZ)
-                        lines.insert(line_index + 2, BeginLine)
-                        nb_line=2
+                        lines.insert(line_index + 3, BeginLine)
+                        nb_line=3
                         for aline in lines_brim:
                             nb_line+=1
                             searchZ = re.search(r"Z(\d*\.?\d*)", aline)
@@ -207,6 +225,13 @@ class MultiBrim(Script):
                             lines.insert(line_index + nb_line, InsertLine)
                         nb_line+=1
                         lines.insert(line_index + nb_line, xyline)
+                        
+                        nb_line+=1
+                        lines.insert(line_index + nb_line, lastE)
+                        
+                        #----------------------------
+                        #    End of modification
+                        #----------------------------
                         nb_line+=1
                         lines.insert(line_index + nb_line, ";END_OF_MODIFICATION")
      
@@ -217,9 +242,10 @@ class MultiBrim(Script):
                     idl = 0
                         
                 if idl == 2 :
-                    if not is_only_extrusion_line(line):
-                        lines_brim.append(line)
-                    
+                    # if not is_only_extrusion_line(line):
+                    lines_brim.append(line)
+                 
+                # Init copy of the BRIM extruding path
                 if idl == 1 and is_begin_skirt_line(line):
                     idl=2
                     line_index = lines.index(line)-1
@@ -232,12 +258,18 @@ class MultiBrim(Script):
                     lines_brim =[]
                     startlayer=currentlayer
                     lines_brim.append(line)
-                    # Logger.log("w", "Z Height %f", currentz) 
+                     
                 
                 if currentlayer <= BrimMultiply and is_z_line(line):
                     searchZ = re.search(r"Z(\d*\.?\d*)", line)
                     if searchZ:
                         currentz=float(searchZ.group(1))
+
+                if currentlayer <= BrimMultiply and is_e_line(line):
+                    searchE = re.search(r"E(\d*\.?\d*)", line)
+                    if searchE:
+                        lastE="G92 E"+float(searchE.group(1))
+
                         
             result = "\n".join(lines)
             data[layer_index] = result
