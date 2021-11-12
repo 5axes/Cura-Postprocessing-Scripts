@@ -10,7 +10,7 @@
 #
 #   Version 1.0 10/11/2021 first prototype right now must be use with the relative extrusion activated and no Zhop
 #   Version 1.1 11/11/2021 first prototype tested on Ender3
-#   Version 1.2 12/11/2021 Adding Speed value for the subsequent brim print
+#   Version 1.2 12/11/2021 Adding Speed value for the subsequent brim print Zhop are still not managed
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -234,17 +234,19 @@ class MultiBrim(Script):
                             nb_line+=1
                             searchZ = re.search(r"Z(\d*\.?\d*)", aline)
                             if searchZ:
-                                cz="Z"+searchZ.group(1)
-                                ModiZ="Z"+str(currentz)
-                                # Logger.log('d', 'Current Z   : {}'.format(cz))
+                                Cz="Z"+searchZ.group(1)
+                                ModiZ="Z"+str(BrimZ)
+                                # Logger.log('d', 'Current Z   : {}'.format(Cz))
                                 # Logger.log('d', 'Modi    Z   : {}'.format(ModiZ))
-                                InsertLine=aline.replace(cz, ModiZ)
+                                InsertLine=aline.replace(Cz, ModiZ)
                             else:
                                 InsertLine=aline
                             lines.insert(line_index + nb_line, InsertLine)
                         nb_line+=1
                         lines.insert(line_index + nb_line, xyline)
-                        
+                        nb_line+=1
+                        lines.insert(line_index + nb_line, "G1 Z"+str(currentz))
+                        # Reset Etruder position
                         nb_line+=1
                         lines.insert(line_index + nb_line, lastE)
                         
@@ -282,6 +284,7 @@ class MultiBrim(Script):
                     if searchZ:
                         StartZ=float(searchZ.group(1))
                         FirstZ="Z"+searchZ.group(1)
+                    BrimZ = StartZ
                     
                     speedline=lines[line_index+3]
                     Logger.log('d', 'speedline   : {}'.format(speedline))
