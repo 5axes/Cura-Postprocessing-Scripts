@@ -11,6 +11,7 @@
 #   Version 1.0 10/11/2021 first prototype right now must be use with the relative extrusion activated and no Zhop
 #   Version 1.1 11/11/2021 first prototype tested on Ender3
 #   Version 1.2 12/11/2021 Adding Speed value for the subsequent brim print Zhop are still not managed
+#   Version 1.3 12/11/2021 ZHop management
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -22,7 +23,7 @@ from enum import Enum
 from collections import namedtuple
 from typing import List, Tuple
 
-__version__ = '1.2'
+__version__ = '1.3'
 
 Point2D = namedtuple('Point2D', 'x y')
 
@@ -188,6 +189,7 @@ class MultiBrim(Script):
         FirstZ=''
         StartZ=0
         BrimZ=0
+        FirstBrimZ=0
         xyline=''
         nb_line=0
         currentlayer=0
@@ -225,7 +227,8 @@ class MultiBrim(Script):
                         # Logger.log('d', 'xyline   : {}'.format(xyline))
                         # Reset the Extruder position
                         lines.insert(line_index + 2, "G92 E0")
-                        BrimZ+=StartZ
+                        DecZ = FirstBrimZ
+                        BrimZ += StartZ
                         ModiZ="Z"+str(BrimZ)
                         BeginLine=startline.replace(FirstZ, ModiZ)
                         lines.insert(line_index + 3, BeginLine)
@@ -234,10 +237,10 @@ class MultiBrim(Script):
                             nb_line+=1
                             searchZ = re.search(r"Z(\d*\.?\d*)", aline)
                             if searchZ:
-                                Cz="Z"+searchZ.group(1)
-                                ModiZ="Z"+str(BrimZ)
-                                # Logger.log('d', 'Current Z   : {}'.format(Cz))
-                                # Logger.log('d', 'Modi    Z   : {}'.format(ModiZ))
+                                Cz="Z"+searchZ.group(1)                       
+                                ModiZ="Z"+str(round((float(searchZ.group(1)   )+DecZ),5))  
+                                Logger.log('d', 'Current Z   : {}'.format(Cz))
+                                Logger.log('d', 'Modi    Z   : {}'.format(ModiZ))
                                 InsertLine=aline.replace(Cz, ModiZ)
                             else:
                                 InsertLine=aline
@@ -255,6 +258,7 @@ class MultiBrim(Script):
                         #----------------------------
                         nb_line+=1
                         lines.insert(line_index + nb_line, ";END_OF_MODIFICATION")
+                        FirstBrimZ += StartZ
      
                 if idl == 2 and is_begin_type_line(line):
                     idl = 0
@@ -284,14 +288,21 @@ class MultiBrim(Script):
                     if searchZ:
                         StartZ=float(searchZ.group(1))
                         FirstZ="Z"+searchZ.group(1)
-                    BrimZ = StartZ
+                    
+                    #Test for Z hop case 
+                    TestLine=lines[line_index+2]
+                    searchZ = re.search(r"Z(\d*\.?\d*)", TestLine)
+                    if searchZ:
+                        StartZ=float(searchZ.group(1))
+                        FirstZ="Z"+searchZ.group(1)
+                    FirstBrimZ = StartZ                   
                     
                     speedline=lines[line_index+3]
-                    Logger.log('d', 'speedline   : {}'.format(speedline))
+                    # Logger.log('d', 'speedline   : {}'.format(speedline))
                     searchF = re.search(r"F(\d*\.?\d*)", speedline)
                     if searchF:
                         BrimF="F"+searchF.group(1)                    
-                        Logger.log('d', 'BrimF     : {}'.format(BrimF))
+                        # Logger.log('d', 'BrimF     : {}'.format(BrimF))
                         
                     lines_brim =[]
                     startlayer=currentlayer
