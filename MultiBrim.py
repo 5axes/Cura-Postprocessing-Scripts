@@ -9,6 +9,7 @@
 #------------------------------------------------------------------------------------------------------------------------------------
 #
 #   Version 1.0 10/11/2021 first prototype right now must be use with the relative extrusion activated and no Zhop
+#   Version 1.1 11/11/2021 first prototype tested on Ender3
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +21,7 @@ from enum import Enum
 from collections import namedtuple
 from typing import List, Tuple
 
-__version__ = '1.0'
+__version__ = '1.1'
 
 Point2D = namedtuple('Point2D', 'x y')
 
@@ -101,7 +102,7 @@ def is_e_line(line: str) -> bool:
     Returns:
         bool: True if the line is an Extruder line segment
     """
-    return "G0" in line  and "E" in line
+    return "G1" in line  and "E" in line
     
     
 def is_only_extrusion_line(line: str) -> bool:
@@ -266,9 +267,9 @@ class MultiBrim(Script):
                         currentz=float(searchZ.group(1))
 
                 if currentlayer <= BrimMultiply and is_e_line(line):
-                    searchE = re.search(r"E(\d*\.?\d*)", line)
+                    searchE = re.search(r"E([-+]?\d*\.?\d*)", line)
                     if searchE:
-                        lastE="G92 E"+float(searchE.group(1))
+                        lastE="G92 E"+searchE.group(1)
 
                         
             result = "\n".join(lines)
