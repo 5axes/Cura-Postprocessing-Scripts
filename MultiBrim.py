@@ -239,8 +239,8 @@ class MultiBrim(Script):
                             if searchZ:
                                 Cz="Z"+searchZ.group(1)                       
                                 ModiZ="Z"+str(round((float(searchZ.group(1)   )+DecZ),5))  
-                                Logger.log('d', 'Current Z   : {}'.format(Cz))
-                                Logger.log('d', 'Modi    Z   : {}'.format(ModiZ))
+                                # Logger.log('d', 'Current Z   : {}'.format(Cz))
+                                # Logger.log('d', 'Modi    Z   : {}'.format(ModiZ))
                                 InsertLine=aline.replace(Cz, ModiZ)
                             else:
                                 InsertLine=aline
