@@ -170,3 +170,16 @@ Script cura to reduce the speed according to the print height.
 	- Display details on LCD : This setting will insert M117 gcode instructions, to display current modification in the G-Code is being used.
 
 ![SlowZ settings](./images/slowzsettings.jpg)
+	
+
+
+MultiBrim.py
+----
+
+Script cura to duplicate the initial Brim/skirt to obtain a thick Brim. 
+
+![MultiBrim.py](./images/multibrim.jpg)
+	
+	- Brim multiply : Number of brim to multiply.
+	
+	- Brim speed : Speed for the subsequent brim.
