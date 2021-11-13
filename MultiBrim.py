@@ -13,7 +13,7 @@
 #   Version 1.2 12/11/2021 Adding Speed value for the subsequent brim print Zhop are still not managed
 #   Version 1.3 12/11/2021 ZHop management
 #   Version 1.4 12/11/2021 Retract management
-#   Version 1.5 13/11/2021 Managent of the situation one piece at a time 
+#   Version 1.5 13/11/2021 Management of Print Sequence 'One at a Time'
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
