@@ -188,11 +188,10 @@ class MultiBrim(Script):
         lines_brim =[]
         StartLine=''
         BrimF='F0'
-        FirstZ=''
+        FirstZToReplace=''
         InitialE=''
         StartZ=0
         BrimZ=0
-        FirstBrimZ=0
         xyline=''
         nb_line=0
         currentlayer=0
@@ -223,7 +222,7 @@ class MultiBrim(Script):
                     # Copy the Original Brim
                     elif currentlayer <= BrimMultiply :
                         # Logger.log('d', 'Insert Here : {:d}'.format(currentlayer))
-                        # Logger.log('d', 'First   Z   : {}'.format(FirstZ))
+                        # Logger.log('d', 'First   Z   : {}'.format(FirstZToReplace))
                         line_index = lines.index(line)
                         xyline=lines[line_index-3]
                         
@@ -240,10 +239,14 @@ class MultiBrim(Script):
                         
                         nb_line+=1
                         lines.insert(line_index + nb_line, InitialE)
-                        DecZ = FirstBrimZ
-                        BrimZ += StartZ
-                        ModiZ="Z"+str(BrimZ)
-                        BeginLine=StartLine.replace(FirstZ, ModiZ)
+                        
+                        #    Set Z position of the Brim
+                        searchZ = re.search(r"Z(\d*\.?\d*)", StartLine)
+                        if searchZ:
+                            FirstZToReplace="Z"+searchZ.group(1)                       
+                            ModiZ="Z"+str(round((float(searchZ.group(1)   )+BrimZ),5))                          
+                                               
+                        BeginLine=StartLine.replace(FirstZToReplace, ModiZ)
                         
                         nb_line+=1
                         lines.insert(line_index + nb_line, BeginLine)
@@ -253,7 +256,7 @@ class MultiBrim(Script):
                             searchZ = re.search(r"Z(\d*\.?\d*)", aline)
                             if searchZ:
                                 Cz="Z"+searchZ.group(1)                       
-                                ModiZ="Z"+str(round((float(searchZ.group(1)   )+DecZ),5))  
+                                ModiZ="Z"+str(round((float(searchZ.group(1)   )+BrimZ),5))  
                                 # Logger.log('d', 'Current Z   : {}'.format(Cz))
                                 # Logger.log('d', 'Modi    Z   : {}'.format(ModiZ))
                                 InsertLine=aline.replace(Cz, ModiZ)
@@ -273,7 +276,7 @@ class MultiBrim(Script):
                         #----------------------------
                         nb_line+=1
                         lines.insert(line_index + nb_line, ";END_OF_MODIFICATION")
-                        FirstBrimZ += StartZ
+                        BrimZ += StartZ
      
                 if idl == 2 and is_begin_type_line(line):
                     idl = 0
@@ -312,20 +315,22 @@ class MultiBrim(Script):
                     idl=2
                     InitialE=''
                     
+                    # StartLine get the Z height
                     line_index = lines.index(line)-1
                     StartLine=lines[line_index]
                     searchZ = re.search(r"Z(\d*\.?\d*)", StartLine)
                     if searchZ:
                         StartZ=float(searchZ.group(1))
-                        FirstZ="Z"+searchZ.group(1)
+                        FirstZToReplace="Z"+searchZ.group(1)
                     
                     # Test for Z hop case 
                     ZHopLine=lines[line_index+2]
                     searchZ = re.search(r"Z(\d*\.?\d*)", ZHopLine)
                     if searchZ:
                         StartZ=float(searchZ.group(1))
-                        FirstZ="Z"+searchZ.group(1)
-                    FirstBrimZ = StartZ                   
+                        FirstZToReplace="Z"+searchZ.group(1)
+                    BrimZ = StartZ
+                    Logger.log('d', 'BrimZ   : {:f}'.format(BrimZ))                    
  
                     # Logger.log('d', 'ZHopLine   : {}'.format(ZHopLine))
                     searchE = re.search(r"E([-+]?\d*\.?\d*)", ZHopLine)
