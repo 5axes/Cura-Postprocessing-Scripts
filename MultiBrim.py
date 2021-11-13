@@ -12,7 +12,8 @@
 #   Version 1.1 11/11/2021 first prototype tested on Ender3
 #   Version 1.2 12/11/2021 Adding Speed value for the subsequent brim print Zhop are still not managed
 #   Version 1.3 12/11/2021 ZHop management
-#   Version 1.4 12/11/2021 Manage Retract
+#   Version 1.4 12/11/2021 Retract management
+#   Version 1.5 13/11/2021 Managent of the situation one piece at a time 
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +25,7 @@ from enum import Enum
 from collections import namedtuple
 from typing import List, Tuple
 
-__version__ = '1.4'
+__version__ = '1.5'
 
 Point2D = namedtuple('Point2D', 'x y')
 
@@ -185,9 +186,10 @@ class MultiBrim(Script):
 
         idl=0
         lines_brim =[]
-        startline=''
+        StartLine=''
         BrimF='F0'
         FirstZ=''
+        InitialE=''
         StartZ=0
         BrimZ=0
         FirstBrimZ=0
@@ -237,11 +239,11 @@ class MultiBrim(Script):
                             lines.insert(line_index + nb_line, "G1 F" + str(RetractF) +  " E" + str(ResetE) )
                         
                         nb_line+=1
-                        lines.insert(line_index + nb_line, "G92 E0")
+                        lines.insert(line_index + nb_line, InitialE)
                         DecZ = FirstBrimZ
                         BrimZ += StartZ
                         ModiZ="Z"+str(BrimZ)
-                        BeginLine=startline.replace(FirstZ, ModiZ)
+                        BeginLine=StartLine.replace(FirstZ, ModiZ)
                         
                         nb_line+=1
                         lines.insert(line_index + nb_line, BeginLine)
@@ -293,30 +295,57 @@ class MultiBrim(Script):
                 #---------------------------------------
                 # Init copy of the BRIM extruding path
                 #---------------------------------------
+                # G0 F6000 X106.445 Y116.579 Z0.2   -> StartLine
+                # ;TYPE:SKIRT
+                # G1 F3000 E0                       -> ZHopLine/ELine
+                # G1 F1200 X106.693 Y116.356 E0.011 -> SpeedLine
+                
+                # or
+                
+                # G0 F6000 X51.318 Y121.726 Z0.4    -> StartLine
+                # ;TYPE:SKIRT
+                # G1 F300 Z0.2                      -> ZHopLine
+                # G1 F3000 E0                       -> ELine
+                # G1 F1080 X51.568 Y121.624 E0.0089 -> SpeedLine
+                
                 if idl == 1 and is_begin_skirt_line(line):
                     idl=2
+                    InitialE=''
+                    
                     line_index = lines.index(line)-1
-                    startline=lines[line_index]
-                    searchZ = re.search(r"Z(\d*\.?\d*)", startline)
+                    StartLine=lines[line_index]
+                    searchZ = re.search(r"Z(\d*\.?\d*)", StartLine)
                     if searchZ:
                         StartZ=float(searchZ.group(1))
                         FirstZ="Z"+searchZ.group(1)
                     
-                    #Test for Z hop case 
-                    TestLine=lines[line_index+2]
-                    searchZ = re.search(r"Z(\d*\.?\d*)", TestLine)
+                    # Test for Z hop case 
+                    ZHopLine=lines[line_index+2]
+                    searchZ = re.search(r"Z(\d*\.?\d*)", ZHopLine)
                     if searchZ:
                         StartZ=float(searchZ.group(1))
                         FirstZ="Z"+searchZ.group(1)
                     FirstBrimZ = StartZ                   
+ 
+                    # Logger.log('d', 'ZHopLine   : {}'.format(ZHopLine))
+                    searchE = re.search(r"E([-+]?\d*\.?\d*)", ZHopLine)
+                    if searchE:
+                        InitialE="G92 E"+str(searchE.group(1))
+                        nb_line=3
+                    else:
+                        ZHopLine=lines[line_index+3]
+                        searchE = re.search(r"E([-+]?\d*\.?\d*)", ZHopLine)
+                        if searchE and InitialE=='' :
+                            InitialE="G92 E"+str(searchE.group(1))    
+                        nb_line=4
                     
-                    speedline=lines[line_index+3]
-                    # Logger.log('d', 'speedline   : {}'.format(speedline))
-                    searchF = re.search(r"F(\d*\.?\d*)", speedline)
+                    SpeedLine=lines[line_index+nb_line]
+                    # Logger.log('d', 'SpeedLine   : {}'.format(SpeedLine))
+                    searchF = re.search(r"F(\d*\.?\d*)", SpeedLine)
                     if searchF:
                         BrimF="F"+searchF.group(1)                    
                         # Logger.log('d', 'BrimF     : {}'.format(BrimF))
-                        
+                    
                     lines_brim =[]
                     startlayer=currentlayer
                     lines_brim.append(line)
