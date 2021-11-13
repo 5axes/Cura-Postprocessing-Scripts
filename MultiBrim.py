@@ -14,6 +14,7 @@
 #   Version 1.3 12/11/2021 ZHop management
 #   Version 1.4 12/11/2021 Retract management
 #   Version 1.5 13/11/2021 Management of Print Sequence 'One at a Time'
+#   Version 1.6 13/11/2021 Management Relative extruder M83
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +26,7 @@ from enum import Enum
 from collections import namedtuple
 from typing import List, Tuple
 
-__version__ = '1.5'
+__version__ = '1.6'
 
 Point2D = namedtuple('Point2D', 'x y')
 
@@ -107,7 +108,28 @@ def is_e_line(line: str) -> bool:
         bool: True if the line is an Extruder line segment
     """
     return "G1" in line  and "E" in line
-    
+
+def is_relative_extrusion_line(line: str) -> bool:
+    """Check if current line is a relative extrusion line
+
+    Args:
+        line (str): Gcode line
+
+    Returns:
+        bool: True if the line is a relative extrusion line
+    """
+    return "M83" in line  
+
+def is_absolute_extrusion_line(line: str) -> bool:
+    """Check if current line is an absolute extrusion line
+
+    Args:
+        line (str): Gcode line
+
+    Returns:
+        bool: True if the line is an absolute  extrusion line
+    """
+    return "M82" in line  
     
 def is_only_extrusion_line(line: str) -> bool:
     """Check if current line is a pure extrusion command.
@@ -200,6 +222,7 @@ class MultiBrim(Script):
         ResetE=0
         lastE='G92 E0'
         RetractF=3000
+        RelativeExtruder = False
         
         for layer in data:
             layer_index = data.index(layer)
@@ -207,6 +230,12 @@ class MultiBrim(Script):
             lines = layer.split("\n")
             for line in lines:                  
                
+                if is_relative_extrusion_line(line):
+                    RelativeExtruder = True
+                
+                if is_absolute_extrusion_line(line):
+                    RelativeExtruder = False
+                    
                 if line.startswith(";LAYER_COUNT:"):
                     # Logger.log("w", "found LAYER_COUNT %s", line[13:])
                     layercount=int(line[13:])                    
@@ -233,12 +262,13 @@ class MultiBrim(Script):
                         lines.insert(line_index + nb_line, ";BEGIN_OF_MODIFICATION")
                         # Logger.log('d', 'xyline   : {}'.format(xyline))
                         # Reset the Extruder position
-                        if RetractE >0 :
+                        if RetractE >0 and RelativeExtruder == False :
                             nb_line+=1
                             lines.insert(line_index + nb_line, "G1 F" + str(RetractF) +  " E" + str(ResetE) )
                         
-                        nb_line+=1
-                        lines.insert(line_index + nb_line, InitialE)
+                        if RelativeExtruder == False :
+                            nb_line+=1
+                            lines.insert(line_index + nb_line, InitialE)
                         
                         #    Set Z position of the Brim
                         searchZ = re.search(r"Z(\d*\.?\d*)", StartLine)
@@ -268,8 +298,9 @@ class MultiBrim(Script):
                         nb_line+=1
                         lines.insert(line_index + nb_line, "G1 Z"+str(currentz))
                         # Reset Etruder position
-                        nb_line+=1
-                        lines.insert(line_index + nb_line, lastE)
+                        if RelativeExtruder == False:
+                            nb_line+=1
+                            lines.insert(line_index + nb_line, lastE)
                         
                         #----------------------------
                         #    End of modification
@@ -311,6 +342,13 @@ class MultiBrim(Script):
                 # G1 F3000 E0                       -> ELine
                 # G1 F1080 X51.568 Y121.624 E0.0089 -> SpeedLine
                 
+                # Relative mode 
+ 
+                # G0 F6000 X109.982 Y102.608 Z0.2
+                # ;TYPE:SKIRT
+                # G1 F3000 E5
+                # G1 F1080 X110.147 Y102.432 E0.00795
+
                 if idl == 1 and is_begin_skirt_line(line):
                     idl=2
                     InitialE=''
