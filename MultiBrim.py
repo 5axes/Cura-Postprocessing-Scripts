@@ -330,7 +330,7 @@ class MultiBrim(Script):
                         StartZ=float(searchZ.group(1))
                         FirstZToReplace="Z"+searchZ.group(1)
                     BrimZ = StartZ
-                    Logger.log('d', 'BrimZ   : {:f}'.format(BrimZ))                    
+                    # Logger.log('d', 'BrimZ   : {:f}'.format(BrimZ))                    
  
                     # Logger.log('d', 'ZHopLine   : {}'.format(ZHopLine))
                     searchE = re.search(r"E([-+]?\d*\.?\d*)", ZHopLine)
