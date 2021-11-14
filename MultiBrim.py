@@ -181,10 +181,10 @@ class MultiBrim(Script):
                     "label": "Brim multiply",
                     "description": "Number of brim to multiply",
                     "type": "int",
-                    "default_value": 2,
-                    "minimum_value": "1",
-                    "maximum_value_warning": "3",
-                    "maximum_value": "5"
+                    "default_value": 1,
+                    "minimum_value": 1,
+                    "maximum_value_warning": 3,
+                    "maximum_value": 5
                 },
                 "speed":
                 {
@@ -193,9 +193,9 @@ class MultiBrim(Script):
                     "type": "float",
                     "unit": "mm/s",
                     "default_value": 30,
-                    "minimum_value": "0",
-                    "maximum_value_warning": "50",
-                    "maximum_value": "100"
+                    "minimum_value": 0,
+                    "maximum_value_warning": 50,
+                    "maximum_value": 100
                 }                
             }
         }"""
