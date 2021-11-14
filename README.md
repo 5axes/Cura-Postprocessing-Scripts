@@ -183,3 +183,5 @@ Script cura to duplicate the initial Brim/skirt to obtain a thick Brim.
 	- Brim multiply : Number of brim to multiply.
 	
 	- Brim speed : Speed for the subsequent brim.
+	
+Multi layer brin height request on Cura Github [#6929](https://github.com/Ultimaker/Cura/issues/6929)
