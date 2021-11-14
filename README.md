@@ -185,5 +185,7 @@ Script cura to duplicate the initial Brim/skirt to obtain a thick Brim.
 	- Brim speed : Speed for the subsequent brim.
 	
 Multi layer brim height request on Cura Github [#6929](https://github.com/Ultimaker/Cura/issues/6929)
+	
+Different tests made with the current release (V1.6)
 
 ![MultiBrim test](./images/multilayerbrim.svg)
