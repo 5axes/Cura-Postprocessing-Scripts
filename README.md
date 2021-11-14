@@ -12,7 +12,7 @@ After the next start of Cura the script can be added via Extension / Post-Proces
 ![Adding script](./images/plugins.jpg)
 
 
-DisplayPrintInfosOnLCD.py
+[DisplayPrintInfosOnLCD.py](DisplayPrintInfosOnLCD.py)
 -----
 
 Description:  This plugin shows custom messages about your print on the Printer Panel...
@@ -27,13 +27,13 @@ Description: Add slicing paramter in the GCode Header
 
 ![GCodeDocumentation.py](./images/GcodeDocumentation.jpg)
 
-SpeedTower.py
+[SpeedTower.py](SpeedTower.py)
 -----
 Description:  postprocessing-script to easily define a Speed Tower.
 
 ![SpeedTower.py](./images/speedtower.jpg)
 
-TempFanTower.py
+[TempFanTower.py](TempFanTower.py)
 -----
 
 Description:  postprocessing-script to easily use an temptower and not use 10 changeAtZ-scripts
@@ -45,7 +45,7 @@ Description:  postprocessing-script to easily use an temptower and not use 10 ch
 ![TempFanTower.py](./images/tempfan.jpg)
 
 
-RetractTower.py
+[RetractTower.py](RetractTower.py)
 -----
 
 Description:  postprocessing-script to easily create a Retract Tower
@@ -59,7 +59,7 @@ Two options :
 ![RetractTower.py](./images/retract-tower.jpg)
 
 
-ZMoveIroning.py
+[ZMoveIroning.py](ZMoveIroning.py)
 -----
 
 Description: ZMoveIroning for 3D prints. Z hop for ironing
@@ -67,7 +67,7 @@ Description: ZMoveIroning for 3D prints. Z hop for ironing
 ![ZMoveIroning.py](./images/ZmoveIroning.jpg)
 
 
-RepRapPrintInfos.py
+[RepRapPrintInfos.py](RepRapPrintInfos.py)
 -----
 
 Description: add header infos and part thumbnail for RepRap machine 3DWOX  
@@ -76,7 +76,7 @@ Description: add header infos and part thumbnail for RepRap machine 3DWOX
 
 **Not fuly tested**
 
-GradientInfill.py (original idea from [CNCKitchen](https://github.com/CNCKitchen/GradientInfill) )
+[GradientInfill.py](GradientInfill.py) (original idea from [CNCKitchen](https://github.com/CNCKitchen/GradientInfill) )
 -----
 
 **Version : 1.5**
@@ -119,7 +119,7 @@ Add a gradual speed variation for machine without direct drive extruder.
 Sample part with a Gradient distance set to 8 mm :
 ![Gradient distance set to 8 mm](./images/gradient3.jpg)
 
-CommentGCode.py
+[CommentGCode.py](CommentGCode.py)
 ----
 
 This Cura Postprocessing Script adds comments to the G-Code. The user can select or deselect comments for M-Commands and G-Commands separately.
@@ -131,13 +131,13 @@ Command, description and parameters are read from a CSV file. If a command is no
 ![CommentGCode.py](./images/commentGcode.jpg)
 
 
-InsertAtLayerChange.py
+[InsertAtLayerChange.py](InsertAtLayerChange.py)
 ----
 
 Modification of the official script with Layer Increment.
 	
 
-FastFirstInfill.py
+[FastFirstInfill.py](FastFirstInfill.py)
 ----
 
 Script cura to set a higher filling speed for the first layer.
@@ -156,7 +156,7 @@ First layer speed after modification with the script.
 ![First layer speed after modification](./images/result.png)
 	
 	
-SlowZ.py
+[SlowZ.py](SlowZ.py)
 ----
 
 Script cura to reduce the speed according to the print height. 
@@ -173,7 +173,7 @@ Script cura to reduce the speed according to the print height.
 	
 
 
-MultiBrim.py
+[MultiBrim.py](MultiBrim.py)
 ----
 
 Script cura to duplicate the initial Brim/skirt to obtain a thick Brim. 
