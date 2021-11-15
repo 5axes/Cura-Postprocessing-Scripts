@@ -10,7 +10,7 @@
 #
 #   Version 1.0 10/11/2021 first prototype right now must be use with the relative extrusion activated and no Zhop
 #   Version 1.1 11/11/2021 first prototype tested on Ender3
-#   Version 1.2 12/11/2021 Adding Speed value for the subsequent brim print Zhop are still not managed
+#   Version 1.2 12/11/2021 Adding Speed value for the subsequent brim print, Zhop are still not managed
 #   Version 1.3 12/11/2021 ZHop management
 #   Version 1.4 12/11/2021 Retract management
 #   Version 1.5 13/11/2021 Management of Print Sequence 'One at a Time'
@@ -178,8 +178,8 @@ class MultiBrim(Script):
             {
                 "multiply":
                 {
-                    "label": "Brim multiply",
-                    "description": "Number of brim to multiply",
+                    "label": "Brim addition",
+                    "description": "Number of brim to add to the existing one.",
                     "type": "int",
                     "default_value": 1,
                     "minimum_value": 1,
@@ -189,7 +189,7 @@ class MultiBrim(Script):
                 "speed":
                 {
                     "label": "Brim speed",
-                    "description": "Speed for the subsequent brim",
+                    "description": "Speed for the subsequent brim.",
                     "type": "float",
                     "unit": "mm/s",
                     "default_value": 30,
