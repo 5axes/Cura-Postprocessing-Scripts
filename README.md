@@ -180,9 +180,9 @@ Script cura to duplicate the initial Brim/skirt to obtain a thick Brim.
 
 ![MultiBrim.py](./images/multibrim.jpg)
 	
-	- Brim multiply : Number of brim to multiply.
+	- Brim addition : Number of brim to add to the existing one.
 	
-	- Brim speed : Speed for the subsequent brim.
+	- Brim speed : Speed for the subsequent brims.
 	
 Multi layer brim height request on Cura Github [#6929](https://github.com/Ultimaker/Cura/issues/6929)
 	
