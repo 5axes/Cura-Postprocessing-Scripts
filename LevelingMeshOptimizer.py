@@ -1,8 +1,11 @@
+#
 # Author : CCS86 
 # Source initial :  https://forum.duet3d.com/topic/14994/f-r-auto-define-m557-mesh-bounds-from-gcode/5?_=1637506151764
 # We have a single parameter (mesh spacing), and it parses the first layer gcode for min/max X and Y coordinates, and then replaces the M557 line in your start gcode.
 # You must have a static mesh leveling command in your start gcode, like: M557 X0:200 Y0:200 S20
 # This command wil be replace by the new M557 command based on the dimmension in the initial G-Code
+#
+# M557 : https://reprap.org/wiki/G-code#M557:_Set_Z_probe_point_or_define_probing_grid
 #
 
 import re
@@ -67,8 +70,8 @@ class LevelingMeshOptimizer(Script):
                 value = float(match[1])
 
                 # Update bounds
-                bounds[axis]["min"] = min(bounds[axis]["min"], value)
-                bounds[axis]["max"] = max(bounds[axis]["max"], value)
+                bounds[axis]["min"] = round(min(bounds[axis]["min"], value),0)
+                bounds[axis]["max"] = round(max(bounds[axis]["max"], value),0)
 
         return bounds
 
@@ -78,9 +81,9 @@ class LevelingMeshOptimizer(Script):
     #   \return The same GCODE but with the bounds of the mesh filled in.
     def fillBounds(self, data: str, bounds: {str: {str: float}}) -> str:
         # Fill in the level command template
-        new_cmd = "M557 X%.3f:%.3f Y%.3f:%.3f S%.3f ; Leveling mesh defined by LevelingMeshOptimizer" % (
-            bounds["X"]["min"], bounds["X"]["max"],
-            bounds["Y"]["min"], bounds["Y"]["max"],
+        new_cmd = "M557 X%.1f:%.1f Y%.1f:%.1f S%.1f ; Leveling mesh defined by LevelingMeshOptimizer" % (
+            bounds["X"]["min"]-1, bounds["X"]["max"],
+            bounds["Y"]["min"]-1, bounds["Y"]["max"],
             self.getSettingValueByKey("spacing"),
         )
 
