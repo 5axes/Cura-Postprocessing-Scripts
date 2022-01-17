@@ -21,7 +21,7 @@ Description:  This plugin shows custom messages about your print on the Printer 
                
 ![DisplayPrintInfosOnLCD.py](./images/PrintInfos.jpg)
 
-GCodeDocumentation.py
+[GCodeDocumentation.py](GCodeDocumentation.py)
 -----
 Description: Add slicing parameter in the GCode Header
 
