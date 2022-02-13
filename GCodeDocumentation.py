@@ -436,6 +436,11 @@ class GCodeDocumentation(Script):
             
         #   support_enable 
         replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_enable")
+        
+        #   support_structure
+        if Major > 4 or ( Major == 4 and Minor >= 8 ) :
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_structure")
+                
         #   support_type
         replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_type")
         #   support_angle
@@ -479,8 +484,11 @@ class GCodeDocumentation(Script):
         #   support_interface_pattern
         if adv_desc :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_interface_pattern")
+        
         #   support_tree_enable 
-        replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_enable")
+        if Major < 4 or ( Major == 4 and Minor <= 9 ) : 
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_enable")
+            
         #   support_tree_angle
         if adv_desc :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_angle",5)
