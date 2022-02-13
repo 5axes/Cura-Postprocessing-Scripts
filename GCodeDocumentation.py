@@ -140,9 +140,11 @@ class GCodeDocumentation(Script):
             except:
                 pass
         
-        # test depuis 3.6
+        Logger.log('d', "Info G-Code Documentation --> " + str(Major) + " / " + str(Minor))
         
-        if self.Major < 4 or ( self.Major < 6 ) :
+        
+        # test depuis 3.6
+        if Major < 4 or Minor < 6 :
             _msg = "Attention Version Cura " + str(CuraVersion)
         
         if _msg != None and _msg != '':
@@ -213,28 +215,7 @@ class GCodeDocumentation(Script):
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"wall_line_count",10)
         #   wall_0_wipe_dist
         if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"wall_0_wipe_dist")           
-        #   top_layers
-        if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"top_layers",10)
-        #   bottom_layers
-        if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"bottom_layers",10)
-        #   top_bottom_pattern 
-        if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"top_bottom_pattern")
-        #   outer_inset_first
-        if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"outer_inset_first")
-        #   travel_compensate_overlapping_walls_enabled
-        if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"travel_compensate_overlapping_walls_enabled")
-        #   fill_perimeter_gaps 
-        if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"fill_perimeter_gaps")
-        #   fill_outline_gaps
-        if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"fill_outline_gaps")
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"wall_0_wipe_dist")  
         #   xy_offset
         if adv_desc :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"xy_offset")   
@@ -250,11 +231,40 @@ class GCodeDocumentation(Script):
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"z_seam_type")
         #   z_seam_corner 
         if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"z_seam_corner")            
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"z_seam_corner")  
+        #   outer_inset_first
+        if adv_desc :
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"outer_inset_first")
+        #   travel_compensate_overlapping_walls_enabled
+        if adv_desc :
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"travel_compensate_overlapping_walls_enabled")
+        #   fill_perimeter_gaps 
+        if adv_desc :
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"fill_perimeter_gaps")
+        #   fill_outline_gaps
+        if adv_desc :
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"fill_outline_gaps")
+
+        #   -----------------------------------  top_bottom -----------------------------
+        if Major > 4 or ( Major == 4 and Minor >= 9 ) :
+            GetLabel = Application.getInstance().getGlobalContainerStack().getProperty("top_bottom", "label") 
+            if adv_desc :
+                replace_string = replace_string + self.SetSect(GetLabel)
+            
+        #   top_layers
+        if adv_desc :
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"top_layers",10)
+        #   bottom_layers
+        if adv_desc :
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"bottom_layers",10)
+        #   top_bottom_pattern 
+        if adv_desc :
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"top_bottom_pattern")
+          
         #   ironing_enabled
         replace_string = replace_string + self.GetDataExtruder(extruder_id,"ironing_enabled")
         
-        ironing_enabled = cbool(self.GetDataExtruder(extruder_id,"ironing_enabled"))
+        ironing_enabled = bool(self.GetDataExtruder(extruder_id,"ironing_enabled"))
         if adv_desc and ironing_enabled :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"ironing_pattern") 
             ironing_only_highest_layer = replace_string + self.GetDataExtruder(extruder_id,"ironing_pattern")            
