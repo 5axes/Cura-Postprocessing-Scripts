@@ -26,6 +26,7 @@
 # Version 5.03 of 07/04/2020 Who  : 5axes What : Add line width info
 # Version 5.04 of 07/05/2020 Who  : 5axes What : Adding support flow info and info on xy_offset (Version 4.6) 
 # Version 5.1.0 of 09/05/2020 Who : 5axes What : Add message for 4.6
+# Version 5.2.0 of 13/02/2022 Who : 5axes What : New Settings
 #
 #
 import string
@@ -39,7 +40,7 @@ catalog = i18nCatalog("cura")
         
 ## 
 class GCodeDocumentation(Script):
-    version = "5.0.4"
+    version = "5.2.0"
     
     def getSettingDataString(self):
         return """{
@@ -125,20 +126,24 @@ class GCodeDocumentation(Script):
         _msg = ''
         VersC=1.0
 
-        # Test version car parametre seulement a partir de 4.6
+
+        # Test version for futur release 4.9
         if "master" in CuraVersion or "beta" in CuraVersion or "BETA" in CuraVersion:
-            Logger.log('d', "Info G-Code Documentation --> " + str(CuraVersion))
-            VersC=4.6  # Master is always a developement version.
+            # Master is always a developement version.
+            Major=4
+            Minor=9
+
         else:
             try:
-                VersC = int(CuraVersion.split(".")[0])+int(CuraVersion.split(".")[1])/10
+                Major = int(CuraVersion.split(".")[0])
+                Minor = int(CuraVersion.split(".")[1])
             except:
                 pass
         
         # test depuis 3.6
-        if VersC < 3.6:
+        
+        if self.Major < 4 or ( self.Major < 6 ) :
             _msg = "Attention Version Cura " + str(CuraVersion)
-            Logger.log('d', "Info G-Code Documentation --> " + str(VersC))
         
         if _msg != None and _msg != '':
             Message("Info G-Code Documentation :" + "\n" + _msg, title = catalog.i18nc("@info:title", "Post Processing")).show()
@@ -237,8 +242,9 @@ class GCodeDocumentation(Script):
         if adv_desc :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"xy_offset_layer_0")  
         #   hole_xy_offset 
-        if adv_desc and VersC >= 4.6:
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"hole_xy_offset")  
+        if adv_desc :
+            if Major > 4 or ( Major == 4 and Minor >= 6 ) :
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"hole_xy_offset")  
         #   z_seam_type 
         if adv_desc :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"z_seam_type")
@@ -247,6 +253,15 @@ class GCodeDocumentation(Script):
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"z_seam_corner")            
         #   ironing_enabled
         replace_string = replace_string + self.GetDataExtruder(extruder_id,"ironing_enabled")
+        
+        ironing_enabled = cbool(self.GetDataExtruder(extruder_id,"ironing_enabled"))
+        if adv_desc and ironing_enabled :
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"ironing_pattern") 
+            ironing_only_highest_layer = replace_string + self.GetDataExtruder(extruder_id,"ironing_pattern")            
+       
+        if adv_desc :
+            if Major > 4 or ( Major == 4 and Minor >= 9 ) :
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"ironing_monotonic")
         
         #   -----------------------------------  infill ------------------------------ 
         GetLabel = Application.getInstance().getGlobalContainerStack().getProperty("infill", "label")
