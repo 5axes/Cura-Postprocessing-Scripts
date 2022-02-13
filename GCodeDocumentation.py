@@ -525,7 +525,14 @@ class GCodeDocumentation(Script):
         replace_string = replace_string + self.GetDataExtruder(extruder_id,"adhesion_type")
         #   brim_width 
         if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"brim_width")
+            if adhesion_type == "brim" :
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"brim_width")
+        if adv_desc :
+            if adhesion_type == "raft" :
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"raft_surface_layers")
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"raft_base_thickness",3)
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"raft_base_line_width",3)
+                
         #   skirt_gap / brim_gap
         if adv_desc :
             if Major > 4 or ( Major == 4 and Minor >= 8 ) :
