@@ -259,15 +259,18 @@ class GCodeDocumentation(Script):
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"bottom_layers",10)
         #   top_bottom_pattern 
         if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"top_bottom_pattern")
-          
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"top_bottom_pattern")    
+        #   skin_monotonic
+        if adv_desc :
+            if Major > 4 or ( Major == 4 and Minor >= 9 ) :
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"skin_monotonic")
         #   ironing_enabled
         replace_string = replace_string + self.GetDataExtruder(extruder_id,"ironing_enabled")
-        
         ironing_enabled = bool(self.GetDataExtruder(extruder_id,"ironing_enabled"))
         if adv_desc and ironing_enabled :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"ironing_pattern") 
-            ironing_only_highest_layer = replace_string + self.GetDataExtruder(extruder_id,"ironing_pattern")            
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"ironing_only_highest_layer") 
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"ironing_only_highest_layer") 
        
         if adv_desc :
             if Major > 4 or ( Major == 4 and Minor >= 9 ) :
@@ -476,7 +479,20 @@ class GCodeDocumentation(Script):
         #   support_interface_pattern
         if adv_desc :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_interface_pattern")
-            
+        #   support_tree_enable 
+        replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_enable")
+        #   support_tree_angle
+        if adv_desc :
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_angle",5)
+        #   support_tree_branch_distance
+        if adv_desc :
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_distance",5)
+        #   support_tree_branch_diameter
+        if adv_desc :
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_diameter",5)
+        #   support_tree_branch_diameter_angle
+        if adv_desc :
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_diameter_angle",5)           
 
         #   -----------------------------------  platform_adhesion ----------------------------- 
         GetLabel = Application.getInstance().getGlobalContainerStack().getProperty("platform_adhesion", "label")
@@ -546,20 +562,13 @@ class GCodeDocumentation(Script):
         if adv_desc :
             replace_string = replace_string + self.SetSect(GetLabel)
             
-        #   support_tree_enable 
-        replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_enable")
-        #   support_tree_angle
+         #   skin_monotonic
         if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_angle",5)
-        #   support_tree_branch_distance
-        if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_distance",5)
-        #   support_tree_branch_diameter
-        if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_diameter",5)
-        #   support_tree_branch_diameter_angle
-        if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_diameter_angle",5)
+            if Major > 4 or ( Major == 4 and Minor >= 9 ) :
+                skin_monotonic = bool(self.GetDataExtruder(extruder_id,"skin_monotonic"))
+                if skin_monotonic :
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"roofing_monotonic")
+        
         #   coasting_enable
         if adv_desc :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"coasting_enable")
