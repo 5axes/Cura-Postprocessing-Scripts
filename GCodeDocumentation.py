@@ -123,6 +123,7 @@ class GCodeDocumentation(Script):
         adv_desc = self.getSettingValueByKey("advanced_desc")
         extruder_id  = self.getSettingValueByKey("extruder_nb")
         extruder_id = extruder_id -1
+        extrud = Application.getInstance().getGlobalContainerStack().extruderList
         _msg = ''
         VersC=1.0
 
@@ -266,10 +267,10 @@ class GCodeDocumentation(Script):
                 replace_string = replace_string + self.GetDataExtruder(extruder_id,"skin_monotonic")
         #   ironing_enabled
         replace_string = replace_string + self.GetDataExtruder(extruder_id,"ironing_enabled")
-        ironing_enabled = bool(self.GetDataExtruder(extruder_id,"ironing_enabled"))
+        ironing_enabled = bool(extrud[extruder_id].getProperty("ironing_enabled", "value"))
+        
         if adv_desc and ironing_enabled :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"ironing_pattern") 
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"ironing_only_highest_layer") 
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"ironing_only_highest_layer") 
        
         if adv_desc :
@@ -438,9 +439,30 @@ class GCodeDocumentation(Script):
         replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_enable")
         
         #   support_structure
+        support_structure=Application.getInstance().getGlobalContainerStack().getProperty("support_structure", "value")
+        Logger.log('d', "Info G-Code Documentation support_structure --> " + str(support_structure))
+        
         if Major > 4 or ( Major == 4 and Minor >= 8 ) :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_structure")
-                
+ 
+        #   support_tree_enable 
+        if Major < 4 or ( Major == 4 and Minor <= 9 ) : 
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_enable")
+        
+        if support_structure == "tree" :       
+            #   support_tree_angle
+            if adv_desc :
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_angle",5)
+            #   support_tree_branch_distance
+            if adv_desc :
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_distance",5)
+            #   support_tree_branch_diameter
+            if adv_desc :
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_diameter",5)
+            #   support_tree_branch_diameter_angle
+            if adv_desc :
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_diameter_angle",5) 
+            
         #   support_type
         replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_type")
         #   support_angle
@@ -454,6 +476,13 @@ class GCodeDocumentation(Script):
         #   support_infill_rate
         if adv_desc :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_infill_rate")
+        #   support_wall_count
+        #   support_brim_enable
+        if adv_desc :
+            if Major > 4 or ( Major == 4 and Minor >= 8 ) : 
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_wall_count")
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_brim_enable")
+                
         #   support_z_distance
         if adv_desc :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_z_distance",5)
@@ -484,23 +513,7 @@ class GCodeDocumentation(Script):
         #   support_interface_pattern
         if adv_desc :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_interface_pattern")
-        
-        #   support_tree_enable 
-        if Major < 4 or ( Major == 4 and Minor <= 9 ) : 
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_enable")
-            
-        #   support_tree_angle
-        if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_angle",5)
-        #   support_tree_branch_distance
-        if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_distance",5)
-        #   support_tree_branch_diameter
-        if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_diameter",5)
-        #   support_tree_branch_diameter_angle
-        if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_diameter_angle",5)           
+                             
 
         #   -----------------------------------  platform_adhesion ----------------------------- 
         GetLabel = Application.getInstance().getGlobalContainerStack().getProperty("platform_adhesion", "label")
@@ -569,11 +582,15 @@ class GCodeDocumentation(Script):
         GetLabel = Application.getInstance().getGlobalContainerStack().getProperty("experimental", "label")
         if adv_desc :
             replace_string = replace_string + self.SetSect(GetLabel)
+ 
+        #   support_tree_enable 
+        if Major < 4 or ( Major == 4 and Minor <= 9 ) : 
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_enable")
             
          #   skin_monotonic
         if adv_desc :
             if Major > 4 or ( Major == 4 and Minor >= 9 ) :
-                skin_monotonic = bool(self.GetDataExtruder(extruder_id,"skin_monotonic"))
+                skin_monotonic = bool(extrud[extruder_id].getProperty("skin_monotonic", "value"))
                 if skin_monotonic :
                     replace_string = replace_string + self.GetDataExtruder(extruder_id,"roofing_monotonic")
         
