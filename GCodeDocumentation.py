@@ -521,11 +521,20 @@ class GCodeDocumentation(Script):
             replace_string = replace_string + self.SetSect(GetLabel)
             
         #   adhesion_type
+        adhesion_type = Application.getInstance().getGlobalContainerStack().getProperty("adhesion_type", "value")
         replace_string = replace_string + self.GetDataExtruder(extruder_id,"adhesion_type")
         #   brim_width 
         if adv_desc :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"brim_width")
-
+        #   skirt_gap / brim_gap
+        if adv_desc :
+            if Major > 4 or ( Major == 4 and Minor >= 8 ) :
+                if adhesion_type == "skirt" :
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"skirt_gap")
+                if adhesion_type == "brim" :
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"brim_gap")
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"brim_outside_only")
+                    
         #   -----------------------------------  dual -----------------------------
         if extruder_count>0:
             GetLabel = Application.getInstance().getGlobalContainerStack().getProperty("dual", "label")
