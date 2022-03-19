@@ -87,7 +87,7 @@ class TempFanTower(Script):
                 "fanchange":
                 {
                     "label": "Fan values in %",
-                    "description": "The fan speed change of each block, list value separated by a comma ';' ",
+                    "description": "The fan speed change of each block, list value separated by a semicolon ';' ",
                     "type": "str",
                     "default_value": "100;40;0",
                     "enabled": "usefanvalue"
