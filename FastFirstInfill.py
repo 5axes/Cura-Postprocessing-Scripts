@@ -9,14 +9,14 @@
 #------------------------------------------------------------------------------------------------------------------------------------
 #
 #   Version 1.0 06/11/2021
-#   Version 1.1 07/11/2021 Modification pour Print Sequence
+#   Version 1.1 07/11/2021 Modification for Print Sequence
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
 from ..Script import Script
 from UM.Logger import Logger
 from UM.Application import Application
-import re #To perform the search
+import re # To perform the search
 from enum import Enum
 
 __version__ = '1.1'
