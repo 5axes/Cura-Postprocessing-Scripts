@@ -189,3 +189,13 @@ Multi layer brim height request on Cura Github [#6929](https://github.com/Ultima
 Different tests made with the current release (V1.6)
 
 ![MultiBrim test](./images/multilayerbrim.svg)
+	
+	
+[ChangeFanValue.py](ChangeFanValue.py)
+----
+
+Script Cura to change the FAN value when we are in the case of Minimum Layer Time. When we are in minimum Layer Time situation the Script fix the FAN values to the **Fan value in %** 
+
+![ChangeFanValue.py](./images/ChangeFanValue.jpg)
+	
+Note : In GCode  100% = 255 for the Fan Value *M106S255*.
