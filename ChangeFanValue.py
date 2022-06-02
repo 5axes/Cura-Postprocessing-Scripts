@@ -46,7 +46,7 @@ class ChangeFanValue(Script):
                 "fanchange":
                 {
                     "label": "Fan values in %",
-                    "description": "The fan speed change of each block, list value separated by a comma ';' ",
+                    "description": "The fan speed change of each block for minimum time Layer situation",
                     "type": "int",
                     "unit": "%",
                     "default_value": 100,
