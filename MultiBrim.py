@@ -15,6 +15,7 @@
 #   Version 1.4 12/11/2021 Retract management
 #   Version 1.5 13/11/2021 Management of Print Sequence 'One at a Time'
 #   Version 1.6 13/11/2021 Management Relative extruder M83
+#   Version 1.6 17/07/2022 Change for 5.0
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +27,7 @@ from enum import Enum
 from collections import namedtuple
 from typing import List, Tuple
 
-__version__ = '1.6'
+__version__ = '1.7'
 
 Point2D = namedtuple('Point2D', 'x y')
 
@@ -341,6 +342,13 @@ class MultiBrim(Script):
                 # G1 F300 Z0.2                      -> ZHopLine
                 # G1 F3000 E0                       -> ELine
                 # G1 F1080 X51.568 Y121.624 E0.0089 -> SpeedLine
+
+                # or Cura 5.0
+                
+                # G0 F6000 X105.91 Y115.98 Z0.2
+                # G0 X105.3 Y117.5
+                # ;TYPE:SKIRT
+                # G1 F1500 E0
                 
                 # Relative mode 
  
@@ -360,7 +368,18 @@ class MultiBrim(Script):
                     if searchZ:
                         StartZ=float(searchZ.group(1))
                         FirstZToReplace="Z"+searchZ.group(1)
-                    
+                    else :
+                        Logger.log('d', 'Format  5.0  : {}'.format(StartLine))
+                        PreviousStartLine=lines[line_index-1]
+                        Logger.log('d', 'Format  5.0 PreviousStartLine : {}'.format(PreviousStartLine))
+                        searchZ = re.search(r"Z(\d*\.?\d*)", PreviousStartLine)
+                        if searchZ:
+                            StartZ=float(searchZ.group(1))
+                            FirstZToReplace="Z"+searchZ.group(1)
+                            StartLine += " "
+                            StartLine += FirstZToReplace
+                        Logger.log('d', 'Format  5.0 StartLine : {}'.format(StartLine))
+
                     # Test for Z hop case 
                     ZHopLine=lines[line_index+2]
                     searchZ = re.search(r"Z(\d*\.?\d*)", ZHopLine)
