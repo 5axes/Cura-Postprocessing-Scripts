@@ -37,8 +37,8 @@ class InhibFan(Script):
             {
                 "inhiblayer":
                 {
-                    "label": "Layer height inhibition",
-                    "description": "Number of Layer to Inhib Layer",
+                    "label": "Layer height Fan inhibition",
+                    "description": "Number of Layer where we Inhib the Fan",
                     "type": "int",
                     "default_value": 4,
                     "minimum_value": 1,
