@@ -343,12 +343,15 @@ class MultiBrim(Script):
                 # G1 F3000 E0                       -> ELine
                 # G1 F1080 X51.568 Y121.624 E0.0089 -> SpeedLine
 
-                # or Cura 5.0
+                # or Cura 5.0 & 5.1
                 
-                # G0 F6000 X105.91 Y115.98 Z0.2
-                # G0 X105.3 Y117.5
+                # G0 F6000 X105.446 Y125.313 Z0.2    -> PreviousStartLine
+                # G0 X104.5 Y127.5                   -> StartLine
                 # ;TYPE:SKIRT
-                # G1 F1500 E0
+                # G1 F3000 E0                        -> ZHopLine/ELine
+                # G1 F1200 X104.54 Y127.012 E0.01629 -> SpeedLine
+                
+                # Modification for Cura 5.0  StartLine += " " + Z0.2
                 
                 # Relative mode 
  
