@@ -203,3 +203,13 @@ Script Cura to change the FAN value when we are in the case of Minimum Layer Tim
 ![ChangeFanValue.py](./images/ChangeFanValue.jpg)
 	
 Note : In GCode  100% = 255 for the Fan Value *M106S255*.
+
+
+[InhibFan.py](InhibFan.py)
+----
+
+Script Cura to turn off the print cooling fan on the first X Layers.
+
+![InhibFan.py](./images/InhibFan.jpg)
+	
+Note : In GCode turn off the print cooling fan. [M107](https://marlinfw.org/docs/gcode/M107.html).
