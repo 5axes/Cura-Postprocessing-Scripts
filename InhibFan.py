@@ -37,8 +37,8 @@ class InhibFan(Script):
             {
                 "inhiblayer":
                 {
-                    "label": "Layer height Fan inhibition",
-                    "description": "Number of Layer where we Inhib the Fan",
+                    "label": "Nb of Layers for Fan inhibition",
+                    "description": "Number of Layer where we want to turn off the print cooling fan",
                     "type": "int",
                     "default_value": 4,
                     "minimum_value": 1,
