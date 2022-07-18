@@ -178,6 +178,10 @@ Script cura to reduce the speed according to the print height.
 
 Script cura to duplicate the initial Brim/skirt to obtain a thick Brim. 
 
+
+**Note :** Updated for Cura 5.0 & 5.1
+
+
 ![MultiBrim.py](./images/multibrim.jpg)
 	
 	- Brim addition : Number of brim to add to the existing one.
