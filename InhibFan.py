@@ -6,7 +6,6 @@
 #
 # Description:  postprocessing-script to supress the Fan on First layers
 #
-#
 #------------------------------------------------------------------------------------------------------------------------------------
 #
 #   Version 1.1 13/07/2022
@@ -56,7 +55,6 @@ class InhibFan(Script):
                 }
             }
         }"""
-
         
     def execute(self, data):
         
@@ -87,20 +85,24 @@ class InhibFan(Script):
             lines = layer.split("\n")
             for line in lines:
  
-                if line.startswith(";LAYER:"):
+                if line.startswith(";LAYER:") and inhiblayer > 0 :
                     current_Layer = int(line.split(":")[1])
                     current_Layer += 1
+                    # If the layer number is smaller than the Nb of Layers for Fan inhibition
                     if current_Layer <= inhiblayer :
                         idl=1
+                    # Special analyse for the following layer    
                     elif current_Layer == (inhiblayer + 1) :
                         line_index = lines.index(line)
                         next_line=lines[line_index+1]
                         Logger.log('d', 'next_line : {}'.format(next_line))
-                        
+                        # If we have a Fan Instruction leave It  
                         if next_line.startswith("M106 S") :
                             Logger.log('d', 'Keep the S Value layer {}'.format(current_Layer))
+                        # If we have a Fan turned off leave it like that  
                         elif next_line.startswith("M107") :
                             Logger.log('d', 'Keep the Fan OFF layer {}'.format(current_Layer))
+                        # If we have nothing then we need to set the fan value to the regular speed
                         else :
                             lines.insert(line_index + 1, "M106 S"+str(setfan))                        
                         idl=0
