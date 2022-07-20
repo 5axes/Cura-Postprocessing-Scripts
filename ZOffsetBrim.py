@@ -149,7 +149,7 @@ class ZOffsetBrim(Script):
                 line_index = lines.index(currentLine)
                 
                 if is_begin_layer_line(currentLine) :
-                    current_Layer = int(line.split(":")[1])
+                    current_Layer = int(currentLine.split(":")[1])
                     current_Layer += 1               
                     continue
                 
@@ -176,8 +176,8 @@ class ZOffsetBrim(Script):
                     if not in_Z_offset:
                         in_Z_offset = True
                         Output_Z=current_z+v_offset
-                        outPutLine = "G1 Z{}\n".format(Output_Z)
-                        outPutLine = outPutLine + currentLine
+                        outPutLine = "G1 Z{}".format(Output_Z)
+                        outPutLine =  currentLine + "\n" + outPutLine 
                         lines[line_index] = outPutLine                    
                     continue
 
