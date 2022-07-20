@@ -60,7 +60,7 @@ def is_extrusion_line(line: str) -> bool:
     return "G1" in line and "X" in line and "Y" in line and "E" in line
 
 def is_not_extrusion_line(line: str) -> bool:
-    """Check if current line is a rapid movement segment.
+    """Check if current line is a rapid movement with a Z component segment.
 
     Args:
         line (str): Gcode line
@@ -68,7 +68,7 @@ def is_not_extrusion_line(line: str) -> bool:
     Returns:
         bool: True if the line is a standard printing segment
     """
-    return "G0" in line and "X" in line and "Y" in line and not "E" in line
+    return "G0" in line and "Z" in line and not "E" in line
 
 def is_begin_skin_segment_line(line: str) -> bool:
     """Check if current line is the start of an skin.
@@ -139,6 +139,7 @@ class ZOffsetBrim(Script):
         currentSection = Section.NOTHING
         in_Z_offset = False
         current_z = 0
+        current_Layer = 0
 
 
         for layer in data:
@@ -146,13 +147,19 @@ class ZOffsetBrim(Script):
             lines = layer.split("\n")
             for currentLine in lines:
                 line_index = lines.index(currentLine)
-                   
-                if is_not_extrusion_line(currentLine) :
-                    Logger.log('d', 'currentLine :'.format(currentLine))
+                
+                if is_begin_layer_line(currentLine) :
+                    current_Layer = int(line.split(":")[1])
+                    current_Layer += 1               
+                    continue
+                
+                if current_Layer == 1 and is_not_extrusion_line(currentLine) :
+                    Logger.log('d', 'currentLine : {}'.format(currentLine))
                     searchZ = re.search(r"Z(\d*\.?\d*)", currentLine)
                     if searchZ :
                         if not in_Z_offset :
-                            current_z=float(searchZ.group(1))                    
+                            current_z=float(searchZ.group(1))
+                            Logger.log('d', 'current_z       : {:f}'.format(current_z))                            
                         else :
                             save_Z=float(searchZ.group(1)) 
                             Output_Z=save_Z+v_offset
@@ -160,8 +167,9 @@ class ZOffsetBrim(Script):
                             outPutZ = "Z{}".format(Output_Z)
                             Logger.log('d', 'save_Z       : {:f}'.format(save_Z))
                             Logger.log('d', 'line : {}'.format(currentLine))
-                            Logger.log('d', 'line replace : {}'.format(currentLine.replace(instructionF,outPutZ)))
+                            Logger.log('d', 'line replace : {}'.format(currentLine.replace(instructionZ,outPutZ)))
                             lines[line_index]=currentLine.replace(instructionZ,outPutZ)
+                    continue
                         
                 if is_begin_skirt_segment_line(currentLine) and not (currentSection == Section.SKIRT):
                     currentSection = Section.SKIRT
