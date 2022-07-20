@@ -134,11 +134,11 @@ class ZOffsetBrim(Script):
     def execute(self, data):
 
         v_offset  = self.getSettingValueByKey("offset")
-
         
         """Parse Gcode and modify infill portions with an extrusion width gradient."""
         currentSection = Section.NOTHING
         in_Z_offset = False
+        current_z = 0
 
 
         for layer in data:
@@ -146,23 +146,22 @@ class ZOffsetBrim(Script):
             lines = layer.split("\n")
             for currentLine in lines:
                 line_index = lines.index(currentLine)
-
-                if "Z" in currentLine and not in_Z_offset :
-                        searchZ = re.search(r"Z(\d*\.?\d*)", currentLine)
-                        if searchZ:
-                            current_z=float(searchZ.group(1))
-                        # Logger.log('d', 'CurZ :' + str(current_z))
-                if "Z" in currentLine and  in_Z_offset :
-                        searchZ = re.search(r"Z(\d*\.?\d*)", currentLine)
-                        if searchZ:
+                   
+                if is_not_extrusion_line(currentLine) :
+                    Logger.log('d', 'currentLine :'.format(currentLine))
+                    searchZ = re.search(r"Z(\d*\.?\d*)", currentLine)
+                    if searchZ :
+                        if not in_Z_offset :
+                            current_z=float(searchZ.group(1))                    
+                        else :
                             save_Z=float(searchZ.group(1)) 
                             Output_Z=save_Z+v_offset
                             instructionZ="Z"+str(searchZ.group(1))
-                            Logger.log('d', 'save_Z       : {:f}'.format(save_F))
+                            outPutZ = "Z{}".format(Output_Z)
+                            Logger.log('d', 'save_Z       : {:f}'.format(save_Z))
                             Logger.log('d', 'line : {}'.format(currentLine))
-                            Logger.log('d', 'line replace : {}'.format(currentLine.replace(instructionF,instructionZ)))
-                            lines[line_index]=currentLine.replace(instructionZ,instructionZ)
-
+                            Logger.log('d', 'line replace : {}'.format(currentLine.replace(instructionF,outPutZ)))
+                            lines[line_index]=currentLine.replace(instructionZ,outPutZ)
                         
                 if is_begin_skirt_segment_line(currentLine) and not (currentSection == Section.SKIRT):
                     currentSection = Section.SKIRT
@@ -179,23 +178,6 @@ class ZOffsetBrim(Script):
                         outPutLine = currentLine + "\nG1 Z{}".format(current_z)
                         lines[line_index] = outPutLine
                     currentSection = Section.NOTHING
-                    continue
-                                     
-
-                if currentSection == Section.SKIRT:
-                    if is_not_extrusion_line(currentLine):
-                        if not in_Z_offset:
-                            in_Z_offset = True
-                            Output_Z=current_z+v_offset
-                            outPutLine = "G1 Z{}\n".format(Output_Z)
-                            outPutLine = outPutLine + currentLine
-                            lines[line_index] = outPutLine
-                    else:
-                        if in_Z_offset:
-                            in_Z_offset = False
-                            outPutLine = currentLine + "\nG1 Z{}".format(current_z)
-                            lines[line_index] = outPutLine
-
                 #
                 # end of analyse
                 #
