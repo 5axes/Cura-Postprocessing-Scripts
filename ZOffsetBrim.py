@@ -70,16 +70,16 @@ def is_not_extrusion_line(line: str) -> bool:
     """
     return "G0" in line and "Z" in line and not "E" in line
 
-def is_begin_skin_segment_line(line: str) -> bool:
-    """Check if current line is the start of an skin.
+def is_retract_line(line: str) -> bool:
+    """Check if current line is a speed movement with a Z component segment.
 
     Args:
         line (str): Gcode line
 
     Returns:
-        bool: True if the line is the start of an skin section
+        bool: True if the line is a standard printing segment
     """
-    return line.startswith(";TYPE:SKIN")
+    return "G1" in line and "Z" in line and not "E" in line
 
 def is_begin_skirt_segment_line(line: str) -> bool:
     """Check if current line is the start of an skirt.
@@ -135,12 +135,10 @@ class ZOffsetBrim(Script):
 
         v_offset  = self.getSettingValueByKey("offset")
         
-        """Parse Gcode and modify infill portions with an extrusion width gradient."""
         currentSection = Section.NOTHING
         in_Z_offset = False
         current_z = 0
         current_Layer = 0
-
 
         for layer in data:
             layer_index = data.index(layer)
@@ -150,42 +148,54 @@ class ZOffsetBrim(Script):
                 
                 if is_begin_layer_line(currentLine) :
                     current_Layer = int(currentLine.split(":")[1])
-                    current_Layer += 1               
+                    current_Layer += 1
+                    Logger.log('d', 'current_Layer : {}'.format(current_Layer))
                     continue
                 
-                if current_Layer == 1 and is_not_extrusion_line(currentLine) :
-                    Logger.log('d', 'currentLine : {}'.format(currentLine))
-                    searchZ = re.search(r"Z(\d*\.?\d*)", currentLine)
-                    if searchZ :
-                        if not in_Z_offset :
-                            current_z=float(searchZ.group(1))
-                            Logger.log('d', 'current_z       : {:f}'.format(current_z))                            
-                        else :
-                            save_Z=float(searchZ.group(1)) 
-                            Output_Z=save_Z+v_offset
-                            instructionZ="Z"+str(searchZ.group(1))
-                            outPutZ = "Z{}".format(Output_Z)
-                            Logger.log('d', 'save_Z       : {:f}'.format(save_Z))
-                            Logger.log('d', 'line : {}'.format(currentLine))
-                            Logger.log('d', 'line replace : {}'.format(currentLine.replace(instructionZ,outPutZ)))
-                            lines[line_index]=currentLine.replace(instructionZ,outPutZ)
-                    continue
+                if current_Layer == 1 :
+                    if is_not_extrusion_line(currentLine) :
+                        Logger.log('d', 'is_not_extrusion_line : {}'.format(currentLine))
+                    if is_retract_line(currentLine) :
+                        Logger.log('d', 'is_retract_line : {}'.format(currentLine))
                         
-                if is_begin_skirt_segment_line(currentLine) and not (currentSection == Section.SKIRT):
-                    currentSection = Section.SKIRT
-                    if not in_Z_offset:
-                        in_Z_offset = True
-                        Output_Z=current_z+v_offset
-                        outPutLine = "G1 Z{}".format(Output_Z)
-                        outPutLine =  currentLine + "\n" + outPutLine 
-                        lines[line_index] = outPutLine                    
-                    continue
-
+                    if is_not_extrusion_line(currentLine) or is_retract_line(currentLine) :
+                        Logger.log('d', 'currentLine with Z : {}'.format(currentLine))
+                        searchZ = re.search(r"Z(\d*\.?\d*)", currentLine)
+                        if searchZ :
+                            if not in_Z_offset :
+                                current_z=float(searchZ.group(1))
+                                Logger.log('d', 'current_z       : {:.3f}'.format(current_z))                            
+                            else :
+                                save_Z=float(searchZ.group(1)) 
+                                Output_Z=save_Z+v_offset
+                                instructionZ="Z"+str(searchZ.group(1))
+                                outPutZ = "Z{:.3f}".format(Output_Z)
+                                Logger.log('d', 'save_Z       : {:.3f}'.format(save_Z))
+                                Logger.log('d', 'line : {}'.format(currentLine))
+                                Logger.log('d', 'line replace : {}'.format(currentLine.replace(instructionZ,outPutZ)))
+                                lines[line_index]=currentLine.replace(instructionZ,outPutZ)
+                
                 if is_begin_segment_line(currentLine) and currentSection == Section.SKIRT:
                     if in_Z_offset:
-                        outPutLine = currentLine + "\nG1 Z{}".format(current_z)
-                        lines[line_index] = outPutLine
+                        lines.insert(line_index + 1, "G0 Z{:.3f}".format(current_z))
+                        in_Z_offset = False
                     currentSection = Section.NOTHING
+                    continue
+                        
+                if is_begin_skirt_segment_line(currentLine) and currentSection != Section.SKIRT :
+                    currentSection = Section.SKIRT
+                    if not in_Z_offset:
+                        # cas avec Z Hop
+                        cLine = lines[line_index+1]
+                        Logger.log('d', 'cLine : {}'.format(cLine))
+                        searchZ = re.search(r"Z(\d*\.?\d*)", cLine)
+                        if searchZ :
+                            current_z=float(searchZ.group(1))
+                            Logger.log('d', 'current_z  SECTION  SKIRT : {:.3f}'.format(current_z))                           
+                        else :
+                            Output_Z=current_z+v_offset
+                            lines.insert(line_index + 1, "G0 Z{:.3f}".format(Output_Z))                            
+                        in_Z_offset = True
                 #
                 # end of analyse
                 #
