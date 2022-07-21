@@ -2,7 +2,7 @@
 """
 ZOffsetBrim for 3D prints.
 
-Z Offset Brim
+Z Offset just on Brim / Skirt
 
 Author: 5axes
 Version: 1.0
@@ -11,12 +11,8 @@ Version: 1.0
 
 from ..Script import Script
 from UM.Logger import Logger
-from UM.Application import Application
 import re #To perform the search
-from cura.Settings.ExtruderManager import ExtruderManager
-from collections import namedtuple
 from enum import Enum
-from typing import List, Tuple
 from UM.Message import Message
 from UM.i18n import i18nCatalog
 catalog = i18nCatalog("cura")
