@@ -143,41 +143,42 @@ class ZOffsetBrim(Script):
         for layer in data:
             layer_index = data.index(layer)
             lines = layer.split("\n")
+            line_index = -1
+
             for currentLine in lines:
-                line_index = lines.index(currentLine)
+                #line_index = lines.index(currentLine)
+                line_index += 1
                 
                 if is_begin_layer_line(currentLine) :
                     current_Layer = int(currentLine.split(":")[1])
                     current_Layer += 1
-                    Logger.log('d', 'current_Layer : {}'.format(current_Layer))
                     continue
                 
-                if current_Layer == 1 :
-                    if is_not_extrusion_line(currentLine) :
-                        Logger.log('d', 'is_not_extrusion_line : {}'.format(currentLine))
-                    if is_retract_line(currentLine) :
-                        Logger.log('d', 'is_retract_line : {}'.format(currentLine))
-                        
+                if current_Layer == 1 :                        
                     if is_not_extrusion_line(currentLine) or is_retract_line(currentLine) :
-                        Logger.log('d', 'currentLine with Z : {}'.format(currentLine))
+                        # Logger.log('d', 'currentLine with Z : {}'.format(currentLine))
+                        # Logger.log('d', 'line_index : {}'.format(line_index))
                         searchZ = re.search(r"Z(\d*\.?\d*)", currentLine)
                         if searchZ :
                             if not in_Z_offset :
-                                current_z=float(searchZ.group(1))
-                                Logger.log('d', 'current_z       : {:.3f}'.format(current_z))                            
+                                current_z=float(searchZ.group(1))                            
                             else :
                                 save_Z=float(searchZ.group(1)) 
                                 Output_Z=save_Z+v_offset
                                 instructionZ="Z"+str(searchZ.group(1))
                                 outPutZ = "Z{:.3f}".format(Output_Z)
-                                Logger.log('d', 'save_Z       : {:.3f}'.format(save_Z))
-                                Logger.log('d', 'line : {}'.format(currentLine))
-                                Logger.log('d', 'line replace : {}'.format(currentLine.replace(instructionZ,outPutZ)))
+                                # Logger.log('d', 'save_Z       : {:.3f}'.format(save_Z))
+                                # Logger.log('d', 'line : {}'.format(currentLine))
+                                # Logger.log('d', 'line replace : {}'.format(currentLine.replace(instructionZ,outPutZ)))
                                 lines[line_index]=currentLine.replace(instructionZ,outPutZ)
                 
                 if is_begin_segment_line(currentLine) and currentSection == Section.SKIRT:
                     if in_Z_offset:
-                        lines.insert(line_index + 1, "G0 Z{:.3f}".format(current_z))
+                        cLine = lines[line_index+1]
+                        # Logger.log('d', 'cLine : {}'.format(cLine))
+                        searchZ = re.search(r"Z(\d*\.?\d*)", cLine)
+                        if not searchZ :
+                            lines.insert(line_index + 1, "G0 Z{:.3f}".format(current_z))
                         in_Z_offset = False
                     currentSection = Section.NOTHING
                     continue
@@ -187,11 +188,9 @@ class ZOffsetBrim(Script):
                     if not in_Z_offset:
                         # cas avec Z Hop
                         cLine = lines[line_index+1]
-                        Logger.log('d', 'cLine : {}'.format(cLine))
                         searchZ = re.search(r"Z(\d*\.?\d*)", cLine)
                         if searchZ :
-                            current_z=float(searchZ.group(1))
-                            Logger.log('d', 'current_z  SECTION  SKIRT : {:.3f}'.format(current_z))                           
+                            current_z=float(searchZ.group(1))                         
                         else :
                             Output_Z=current_z+v_offset
                             lines.insert(line_index + 1, "G0 Z{:.3f}".format(Output_Z))                            
