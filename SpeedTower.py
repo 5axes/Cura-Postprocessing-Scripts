@@ -7,9 +7,10 @@
 # Description:  postprocessing script to easily define a Speed Tower 
 #           Option for  Speed
 #                       Acceleration
+#                       Jerk
 #                       Junction Deviation
 #                       Marlin Linear Advance
-#                       RepRap Pressure Adance
+#                       RepRap Pressure Advance
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 #
@@ -18,6 +19,9 @@
 #   Version 1.2 05/04/2021 by dotdash32(https://github.com/dotdash32) for Marlin Linear Advance & RepRap Pressure Advance
 #   Version 1.3 18/04/2021  : ChangeLayerOffset += 2
 #   Version 1.4 18/05/2021  : float
+#   Version 1.5 14/02/2022  : Set Speed using M220 S
+#   Version 1.6 15/02/2022  : Change Int for changelayeroffset & changelayer
+#   Version 1.7 04/08/2022  : Restore and Save the Speed Factor in case of Speed option by using M220 B and M220 R
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +30,7 @@ from UM.Application import Application
 from UM.Logger import Logger
 import re #To perform the search
 
-__version__ = '1.4'
+__version__ = '1.7'
 
 class SpeedTower(Script):
     def __init__(self):
@@ -45,6 +49,7 @@ class SpeedTower(Script):
                     "description": "GCode Commande",
                     "type": "enum",
                     "options": {
+                        "speed": "Speed",
                         "acceleration": "Acceleration",
                         "jerk": "Jerk",
                         "junction": "Junction Deviation",
@@ -56,22 +61,22 @@ class SpeedTower(Script):
                 "startValue":
                 {
                     "label": "Starting value",
-                    "description": "the starting value of the Tower.",
+                    "description": "The starting value of the Tower.",
                     "type": "float",
                     "default_value": 8.0
                 },
                 "valueChange":
                 {
                     "label": "Value Increment",
-                    "description": "the value change of each block, can be positive or negative. I you want 50 and then 40, you need to set this to -10.",
+                    "description": "The value change of each block, can be positive or negative. I you want 50 and then 40, you need to set this to -10.",
                     "type": "float",
                     "default_value": 4.0
                 },
                 "changelayer":
                 {
                     "label": "Change Layer",
-                    "description": "how many layers needs to be printed before the value should be changed.",
-                    "type": "float",
+                    "description": "How many layers needs to be printed before the value should be changed.",
+                    "type": "int",
                     "default_value": 30,
                     "minimum_value": 1,
                     "maximum_value": 1000,
@@ -80,8 +85,8 @@ class SpeedTower(Script):
                 "changelayeroffset":
                 {
                     "label": "Change Layer Offset",
-                    "description": "if the Tower has a base, put the layer high off it here",
-                    "type": "float",
+                    "description": "If the print has a base, indicate the number of layers from which to start the changes.",
+                    "type": "int",
                     "default_value": 4,
                     "minimum_value": 0,
                     "maximum_value": 1000,
@@ -103,14 +108,14 @@ class SpeedTower(Script):
         Instruction = self.getSettingValueByKey("command")
         StartValue = float(self.getSettingValueByKey("startValue"))
         ValueChange = float(self.getSettingValueByKey("valueChange"))
-        ChangeLayer = self.getSettingValueByKey("changelayer")
-        ChangeLayerOffset = self.getSettingValueByKey("changelayeroffset")
+        ChangeLayer = int(self.getSettingValueByKey("changelayer"))
+        ChangeLayerOffset = int(self.getSettingValueByKey("changelayeroffset"))
         ChangeLayerOffset += 2  # Modification to take into account the numbering offset in Gcode
                                 # layer_index = 0 for initial Block 1= Start Gcode normaly first layer = 0 
 
         CurrentValue = StartValue
         Command=""
-
+        max_layer=9999
         idl=0
         
         for layer in data:
@@ -118,12 +123,20 @@ class SpeedTower(Script):
             
             lines = layer.split("\n")
             for line in lines:                  
-               
+                if line.startswith(";LAYER_COUNT:"):
+                    max_layer = int(line.split(":")[1])   # Recuperation Nb Layer Maxi
+                    # Logger.log('d', 'Max_layer : {}'.format(max_layer))
+                    
                 if line.startswith(";LAYER:"):
                     line_index = lines.index(line)
                     # Logger.log('d', 'Instruction : {}'.format(Instruction))
+                    # Logger.log('d', 'layer_index : {}'.format(layer_index))
+                    # Logger.log('d', 'ChangeLayerOffset : {}'.format(ChangeLayerOffset))
 
                     if (layer_index==ChangeLayerOffset):
+                        if  (Instruction=='speed'):
+                            Command = "M220 B\nM220 S{:d}".format(int(CurrentValue))
+                            lcd_gcode = "M117 Speed S{:d}".format(int(CurrentValue))
                         if  (Instruction=='acceleration'):
                             Command = "M204 S{:d}".format(int(CurrentValue))
                             lcd_gcode = "M117 Acceleration S{:d}".format(int(CurrentValue))
@@ -147,6 +160,9 @@ class SpeedTower(Script):
 
                     if ((layer_index-ChangeLayerOffset) % ChangeLayer == 0) and ((layer_index-ChangeLayerOffset)>0):
                             CurrentValue += ValueChange
+                            if  (Instruction=='speed'):
+                                Command = "M220 S{:d}".format(int(CurrentValue))
+                                lcd_gcode = "M117 Speed S{:d}".format(int(CurrentValue))
                             if  (Instruction=='acceleration'):
                                 Command = "M204 S{:d}".format(int(CurrentValue))
                                 lcd_gcode = "M117 Acceleration S{:d}".format(int(CurrentValue))
@@ -168,7 +184,13 @@ class SpeedTower(Script):
                             if UseLcd == True :               
                                lines.insert(line_index + 3, lcd_gcode)                                              
             
+            # Logger.log('d', 'layer_index : {}'.format(layer_index))
+            if  (Instruction=='speed') and  (layer_index==max_layer+1) :
+                line_index = len(lines)
+                # Logger.log('d', 'line_index : {}'.format(line_index))
+                lines.insert(line_index, "M220 R\n")
+                
             result = "\n".join(lines)
             data[layer_index] = result
-
+        
         return data

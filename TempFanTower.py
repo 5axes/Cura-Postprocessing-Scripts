@@ -4,7 +4,7 @@
 # Author:   5axes
 # Date:     January 13, 2020
 #
-# Description:  postprocessing-script to easily use an temptower and not use 10 changeAtZ-scripts
+# Description:  postprocessing-script to easily define a TempTower and not use 10 changeAtZ-scripts
 #
 #
 #------------------------------------------------------------------------------------------------------------------------------------
@@ -14,13 +14,15 @@
 #   Version 1.3 18/04/2021  : ChangeLayerOffset += 2
 #   Version 1.4 18/05/2021  : ChangeLayerOffset
 #
+#   Version 1.5 15/02/2022 Change Int for Layeroffset & changelayer
+#   Version 1.6 05/08/2022 Option maintainbridgevalue
 #------------------------------------------------------------------------------------------------------------------------------------
 
 from ..Script import Script
 from UM.Application import Application
 from UM.Logger import Logger
 
-__version__ = '1.4'
+__version__ = '1.6'
 
 class TempFanTower(Script):
     def __init__(self):
@@ -48,7 +50,7 @@ class TempFanTower(Script):
                 "temperaturechange":
                 {
                     "label": "Temperature Increment",
-                    "description": "The temperature change of each block, can be positive or negative. I you want 220 and then 210, you need to set this to -10",
+                    "description": "The temperature change of each block, can be positive or negative. If you want 220 and then 210, you need to set this to -10",
                     "type": "int",
                     "default_value": -5,
                     "minimum_value": -100,
@@ -60,7 +62,7 @@ class TempFanTower(Script):
                 {
                     "label": "Change Layer",
                     "description": "How many layers needs to be printed before the temperature should be changed",
-                    "type": "float",
+                    "type": "int",
                     "default_value": 52,
                     "minimum_value": 1,
                     "maximum_value": 1000,
@@ -70,8 +72,8 @@ class TempFanTower(Script):
                 "changelayeroffset":
                 {
                     "label": "Change Layer Offset",
-                    "description": "If the Temptower has a base, put the layer high off it here",
-                    "type": "float",
+                    "description": "If the print has a base, indicate the number of layers from which to start the changes.",
+                    "type": "int",
                     "default_value": 5,
                     "minimum_value": 0,
                     "maximum_value": 1000,
@@ -87,9 +89,17 @@ class TempFanTower(Script):
                 "fanchange":
                 {
                     "label": "Fan values in %",
-                    "description": "The fan speed change of each block, list value separated by a semicolon ';' ",
+                    "description": "The fan speed change of each block, list value separated by a comma ';' ",
                     "type": "str",
                     "default_value": "100;40;0",
+                    "enabled": "usefanvalue"
+                },
+                "maintainbridgevalue":
+                {
+                    "label": "Keep Bridge Fan Value",
+                    "description": "Don't Change the Bridge Fan value",
+                    "type": "bool",
+                    "default_value": false,
                     "enabled": "usefanvalue"
                 }
             }
@@ -99,8 +109,8 @@ class TempFanTower(Script):
         
         startTemperature = self.getSettingValueByKey("startTemperature")
         temperaturechange = self.getSettingValueByKey("temperaturechange")
-        changelayer = self.getSettingValueByKey("changelayer")
-        ChangeLayerOffset = self.getSettingValueByKey("changelayeroffset")
+        changelayer = int(self.getSettingValueByKey("changelayer"))
+        ChangeLayerOffset = int(self.getSettingValueByKey("changelayeroffset"))
         ChangeLayerOffset += 2  # Modification to take into account the numbering offset in Gcode
                                 # layer_index = 0 for initial Block 1= Start Gcode normaly first layer = 0
         
@@ -111,8 +121,10 @@ class TempFanTower(Script):
         
         if (nbval>0):
             usefan = bool(self.getSettingValueByKey("usefanvalue"))
+            bridgevalue = bool(self.getSettingValueByKey("maintainbridgevalue"))
         else:
             usefan = False
+            bridgevalue = False
 
         
         currentTemperature = startTemperature
@@ -125,17 +137,25 @@ class TempFanTower(Script):
             layer_index = data.index(layer)
             
             lines = layer.split("\n")
-            for line in lines:
-                if line.startswith("M106 S") and ((layer_index-ChangeLayerOffset)>0) and (usefan) and (afterbridge):
-                    line_index = lines.index(line)
-                    currentfan = int((int(fanvalues[idl])/100)*255)  #  100% = 255 pour ventilateur
-                    lines[line_index] = "M106 S"+str(int(currentfan))+ " ; FAN MODI"
-                    afterbridge == False                    
+            for line in lines:                    
+                if line.startswith("M106 S") and ((layer_index-ChangeLayerOffset)>0) and (usefan) :
+                    if  afterbridge or not bridgevalue :
+                        line_index = lines.index(line)
+                        currentfan = int((int(fanvalues[idl])/100)*255)  #  100% = 255 pour ventilateur
+                        lines[line_index] = "M106 S"+str(int(currentfan))+ " ; FAN MODI"
+                        afterbridge -= 1
+                    else :  
+                        line_index = lines.index(line)
+                        afterbridge += 1                        
 
                 if line.startswith("M107") and ((layer_index-ChangeLayerOffset)>0) and (usefan):
-                    afterbridge == True
+                    afterbridge = 1
                     line_index = lines.index(line)
-                
+
+                if line.startswith(";BRIDGE") :
+                    afterbridge = 0
+                    line_index = lines.index(line)
+                    
                 if line.startswith(";LAYER:"):
                     line_index = lines.index(line)
                     
