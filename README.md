@@ -33,6 +33,14 @@ Description:  postprocessing-script to easily define a Speed Tower.
 
 ![SpeedTower.py](./images/speedtower.jpg)
 
+ This script offer the possibilities to modify :
+- Speed ( By using  M220 instruction ) 
+- Acceleration
+- Jerk
+- Junction Deviation
+- Marlin Linear Advance
+- RepRap Pressure Advance
+
 [TempFanTower.py](TempFanTower.py)
 -----
 
