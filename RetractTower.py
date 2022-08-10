@@ -25,6 +25,8 @@
 #                                  ....
 #                                  G1 F2700 E1.00000
 #
+#   Version 1.7 15/02/2022 Change Int for Layeroffset & changelayer
+#   Version 1.8 11/08/2022 Init on G92 E0
 #------------------------------------------------------------------------------------------------------------------------------------
 
 from ..Script import Script
@@ -33,7 +35,7 @@ from UM.Application import Application
 import re #To perform the search
 from enum import Enum
 
-__version__ = '1.5'
+__version__ = '1.8'
 
 class Section(Enum):
     """Enum for section type."""
@@ -148,30 +150,30 @@ class RetractTower(Script):
                 "startValue":
                 {
                     "label": "Starting value",
-                    "description": "the starting value of the Tower (speed/distance).",
+                    "description": "The starting value of the Tower (speed/distance).",
                     "type": "float",
                     "default_value": 10
                 },
                 "valueChange":
                 {
                     "label": "Value Increment",
-                    "description": "the value change of each block, can be positive or negative (speed/distance).",
+                    "description": "The value change of each block, can be positive or negative (speed/distance).",
                     "type": "float",
                     "default_value": 10
                 },
                 "changelayer":
                 {
                     "label": "Change Layer",
-                    "description": "how many layers needs to be printed before the value should be changed.",
-                    "type": "float",
+                    "description": "How many layers needs to be printed before the value should be changed.",
+                    "type": "int",
                     "default_value": 38,
                     "minimum_value": 1
                 },
                 "changelayeroffset":
                 {
                     "label": "Change Layer Offset",
-                    "description": "if the Tower has a base, put the layer high off it here",
-                    "type": "float",
+                    "description": "If the print has a base, indicate the number of layers from which to start the changes.",
+                    "type": "int",
                     "default_value": 5,
                     "minimum_value": 0
                 },
@@ -205,8 +207,8 @@ class RetractTower(Script):
         Instruction = self.getSettingValueByKey("command")
         StartValue = self.getSettingValueByKey("startValue")
         ValueChange = self.getSettingValueByKey("valueChange")
-        ChangeLayer = self.getSettingValueByKey("changelayer")
-        ChangeLayerOffset = self.getSettingValueByKey("changelayeroffset")
+        ChangeLayer = int(self.getSettingValueByKey("changelayer"))
+        ChangeLayerOffset = int(self.getSettingValueByKey("changelayeroffset"))
         ChangeLayerOffset += 2  # Modification to take into account the numbering offset in Gcode
                                 # layer_index = 0 for initial Block 1= Start Gcode normaly first layer = 0 
 
@@ -239,9 +241,11 @@ class RetractTower(Script):
                     
                 if is_not_relative_instruction_line(line):
                     relative_extrusion = False
+                    
                 if is_reset_extruder_line(line):
-                    # Logger.log('d', 'Reset_extruder :' + str(current_e))
+                    Logger.log('d', 'Reset_extruder :' + str(current_e))
                     current_e = 0
+                    save_e = 0
                     
                 # If we have define a value
                 if CurrentValue>=0:
@@ -285,7 +289,7 @@ class RetractTower(Script):
                                         lcd_gcode = "M117 speed F{:d}".format(int(CurrentValue))
                                     if  (Instruction=='distance'):
                                         current_e = save_e - CurrentValue
-                                        lines[line_index] = "G1 F{:d} E{:.5f}".format(int(current_f), current_e)
+                                        lines[line_index] = "G1 F{:d} E{:.5f} ; Modi".format(int(current_f), current_e)
                                         lcd_gcode = "M117 retract E{:.3}".format(float(CurrentValue))
                                 else:
                                     # Logger.log('d', 'Mode reset')
