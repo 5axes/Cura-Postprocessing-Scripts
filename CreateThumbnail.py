@@ -1,13 +1,24 @@
+#------------------------------------------------------------------------------
+# Cura JPEG Thumbnail creator
+# Professional firmware for Ender3v2
+# Miguel A. Risco-Castillo
+# version: 1.4
+# date: 2022-05-18
+#
+# Contains code from:
+# https://github.com/Ultimaker/Cura/blob/master/plugins/PostProcessingPlugin/scripts/CreateThumbnail.py
+#------------------------------------------------------------------------------
+
 import base64
 
 from UM.Logger import Logger
 from cura.Snapshot import Snapshot
-from PyQt6.QtCore import QByteArray, QIODevice, QBuffer
+from cura.CuraVersion import CuraVersion
 
 from ..Script import Script
 
 
-class CreateThumbnail(Script):
+class CreateJPEGThumbnail(Script):
     def __init__(self):
         super().__init__()
 
@@ -19,12 +30,29 @@ class CreateThumbnail(Script):
             Logger.logException("w", "Failed to create snapshot image")
 
     def _encodeSnapshot(self, snapshot):
+
+        Major=0
+        Minor=0
+        try:
+          Major = int(CuraVersion.split(".")[0])
+          Minor = int(CuraVersion.split(".")[1])
+        except:
+          pass
+        
+        if Major < 5 :
+          from PyQt5.QtCore import QByteArray, QIODevice, QBuffer
+        else :
+          from PyQt6.QtCore import QByteArray, QIODevice, QBuffer
+
         Logger.log("d", "Encoding thumbnail image...")
         try:
             thumbnail_buffer = QBuffer()
-            thumbnail_buffer.open(QBuffer.OpenModeFlag.ReadWrite)
+            if Major < 5 :
+              thumbnail_buffer.open(QBuffer.ReadWrite)
+            else:
+              thumbnail_buffer.open(QBuffer.OpenModeFlag.ReadWrite)
             thumbnail_image = snapshot
-            thumbnail_image.save(thumbnail_buffer, "PNG")
+            thumbnail_image.save(thumbnail_buffer, "JPG")
             base64_bytes = base64.b64encode(thumbnail_buffer.data())
             base64_message = base64_bytes.decode('ascii')
             thumbnail_buffer.close()
@@ -37,7 +65,7 @@ class CreateThumbnail(Script):
 
         encoded_snapshot_length = len(encoded_snapshot)
         gcode.append(";")
-        gcode.append("; thumbnail begin {} {} {}".format(
+        gcode.append("; thumbnail begin {}x{} {}".format(
             width, height, encoded_snapshot_length))
 
         chunks = ["; {}".format(encoded_snapshot[i:i+chunk_size])
@@ -52,8 +80,8 @@ class CreateThumbnail(Script):
 
     def getSettingDataString(self):
         return """{
-            "name": "Create Thumbnail",
-            "key": "CreateThumbnail",
+            "name": "Create JPEG Thumbnail",
+            "key": "CreateJPEGThumbnail",
             "metadata": {},
             "version": 2,
             "settings":
@@ -64,7 +92,7 @@ class CreateThumbnail(Script):
                     "description": "Width of the generated thumbnail",
                     "unit": "px",
                     "type": "int",
-                    "default_value": 32,
+                    "default_value": 230,
                     "minimum_value": "0",
                     "minimum_value_warning": "12",
                     "maximum_value_warning": "800"
@@ -75,7 +103,7 @@ class CreateThumbnail(Script):
                     "description": "Height of the generated thumbnail",
                     "unit": "px",
                     "type": "int",
-                    "default_value": 32,
+                    "default_value": 180,
                     "minimum_value": "0",
                     "minimum_value_warning": "12",
                     "maximum_value_warning": "600"
