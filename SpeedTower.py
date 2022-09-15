@@ -22,6 +22,7 @@
 #   Version 1.5 14/02/2022  : Set Speed using M220 S
 #   Version 1.6 15/02/2022  : Change Int for changelayeroffset & changelayer
 #   Version 1.7 04/08/2022  : Restore and Save the Speed Factor in case of Speed option by using M220 B and M220 R
+#                             https://marlinfw.org/docs/gcode/M220.html
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 

@@ -27,6 +27,7 @@
 #
 #   Version 1.7 15/02/2022 Change Int for Layeroffset & changelayer
 #   Version 1.8 11/08/2022 Init on G92 E0
+#   Version 1.9 13/09/2022 Do not detect M83 in comment line
 #------------------------------------------------------------------------------------------------------------------------------------
 
 from ..Script import Script
@@ -35,7 +36,7 @@ from UM.Application import Application
 import re #To perform the search
 from enum import Enum
 
-__version__ = '1.8'
+__version__ = '1.9'
 
 class Section(Enum):
     """Enum for section type."""
@@ -235,15 +236,17 @@ class RetractTower(Script):
             for line in lines:                  
                 line_index = lines.index(line)
                 
-                if is_relative_instruction_line(line):
+                # Check if the line start with the Comment Char
+                if is_relative_instruction_line(line) and line[0] != ";" :
                     relative_extrusion = True
                     # Logger.log('d', 'Relative_extrusion founded : {}'.format(line))
-                    
-                if is_not_relative_instruction_line(line):
+                
+                # Check if the line start with the Comment Char                
+                if is_not_relative_instruction_line(line) and line[0] != ";" :
                     relative_extrusion = False
                     
-                if is_reset_extruder_line(line):
-                    Logger.log('d', 'Reset_extruder :' + str(current_e))
+                if is_reset_extruder_line(line) and line[0] != ";" :
+                    # Logger.log('d', 'Reset_extruder :' + str(current_e))
                     current_e = 0
                     save_e = 0
                     
