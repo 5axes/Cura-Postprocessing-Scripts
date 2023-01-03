@@ -15,9 +15,7 @@ from UM.Logger import Logger
 from UM.Application import Application
 import re #To perform the search
 from cura.Settings.ExtruderManager import ExtruderManager
-from collections import namedtuple
 from enum import Enum
-from typing import List, Tuple
 from UM.Message import Message
 from UM.i18n import i18nCatalog
 catalog = i18nCatalog("cura")
@@ -124,7 +122,7 @@ class FanIroning(Script):
         extruder_id  = self.getSettingValueByKey("extruder_nb")
         extruder_id = extruder_id -1
 
-        ironing_fan_value  = int(self.getSettingValueByKey("fan_value"))*255
+        ironing_fan_value  = int((float(self.getSettingValueByKey("fan_value"))/100)*255)
 
         #   machine_extruder_count
         extruder_count=Application.getInstance().getGlobalContainerStack().getProperty("machine_extruder_count", "value")
@@ -132,8 +130,6 @@ class FanIroning(Script):
         if extruder_id>extruder_count :
             extruder_id=extruder_count
 
-        # Deprecation function
-        # extrud = list(Application.getInstance().getGlobalContainerStack().extruders.values())
         extrud = Application.getInstance().getGlobalContainerStack().extruderList
    
         ironingenabled = extrud[extruder_id].getProperty("ironing_enabled", "value")
