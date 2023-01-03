@@ -128,7 +128,6 @@ class ZMoveIroning(Script):
         speed_z_hop = int(extrud[extruder_id].getProperty("speed_z_hop", "value"))
         speed_z_hop = speed_z_hop * 60
 
-        relativeextrusion = extrud[extruder_id].getProperty("relative_extrusion", "value")
         ironingenabled = extrud[extruder_id].getProperty("ironing_enabled", "value")
         if ironingenabled == False:
             #
@@ -148,11 +147,9 @@ class ZMoveIroning(Script):
         in_z_hop = False
 
 
-        for layer in data:
-            layer_index = data.index(layer)
+        for layer_index, layer in enumerate(data):
             lines = layer.split("\n")
-            for currentLine in lines:
-                line_index = lines.index(currentLine)
+            for line_index, currentLine in enumerate(lines):
 
                 if "Z" in currentLine and "G0" in currentLine:
                         searchZ = re.search(r"Z(\d*\.?\d*)", currentLine)
@@ -178,13 +175,13 @@ class ZMoveIroning(Script):
                         if not in_z_hop:
                             in_z_hop = True
                             Output_Z=current_z+retraction_hop
-                            outPutLine = "G1 F{} Z{}\n".format(speed_z_hop,Output_Z)
+                            outPutLine = "G1 F{} Z{:.3f}\n".format(speed_z_hop,Output_Z)
                             outPutLine = outPutLine + currentLine
                             lines[line_index] = outPutLine
                     else:
                         if in_z_hop:
                             in_z_hop = False
-                            outPutLine = currentLine + "\nG1 F{} Z{}".format(speed_z_hop,current_z)
+                            outPutLine = currentLine + "\nG1 F{} Z{:.3f}".format(speed_z_hop,current_z)
                             lines[line_index] = outPutLine
  
                     #
