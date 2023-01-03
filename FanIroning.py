@@ -1,8 +1,8 @@
-# FlowIroning
+# FanIroning
 """
-FlowIroning for 3D prints.
+FanIroning for 3D prints.
 
-Set Flow value for ironing
+Set Fan value for ironing
 
 Author  : 5axes
 Version : 1.0
@@ -83,11 +83,11 @@ def is_begin_skin_segment_line(line: str) -> bool:
     return line.startswith(";TYPE:SKIN")
 
         
-class FlowIroning(Script):
+class FanIroning(Script):
     def getSettingDataString(self):
         return """{
-            "name": "Flow Ironing",
-            "key": "FlowIroning",
+            "name": "Fan Ironing",
+            "key": "FanIroning",
             "metadata": {},
             "version": 2,
             "settings":
@@ -146,7 +146,7 @@ class FlowIroning(Script):
         """Parse Gcode and modify infill portions with an extrusion width gradient."""
         currentSection = Section.NOTHING
         set_ironing_fan_value = False
-        current_flow = 0
+        current_Fan = 0
 
 
         for layer_index, layer in enumerate(data):
@@ -156,8 +156,8 @@ class FlowIroning(Script):
                 if "M106" in currentLine and not set_ironing_fan_value :
                         searchM106 = re.search(r"S(\d*\.?\d*)", currentLine)
                         if searchM106:
-                            current_flow=int(searchM106.group(1))
-                            Logger.log('d', 'current_flow :' + str(current_flow))
+                            current_Fan=int(searchM106.group(1))
+                            Logger.log('d', 'current_Fan :' + str(current_Fan))
  
                 if is_begin_skin_segment_line(currentLine) and not (currentSection == Section.SKIN):
                     currentSection = Section.SKIN                 
@@ -176,7 +176,7 @@ class FlowIroning(Script):
                         currentSection = Section.NOTHING                  
                         if set_ironing_fan_value :
                             set_ironing_fan_value = False
-                            outPutLine = "\nM106 S{:d}".format(current_flow)
+                            outPutLine = "\nM106 S{:d}".format(current_Fan)
                             # Logger.log('d', 'Reset A outPutLine :' + str(outPutLine))
                             outPutLine = currentLine + outPutLine 
                             lines[line_index] = outPutLine
@@ -188,7 +188,7 @@ class FlowIroning(Script):
                     currentSection = Section.NOTHING
                     if set_ironing_fan_value :
                         set_ironing_fan_value = False
-                        outPutLine = "\nM106 S{:d}".format(current_flow)
+                        outPutLine = "\nM106 S{:d}".format(current_Fan)
                         # Logger.log('d', 'Reset B outPutLine :' + str(outPutLine))
                         outPutLine = currentLine + outPutLine 
                         lines[line_index] = outPutLine                       

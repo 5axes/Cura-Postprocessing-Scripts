@@ -74,6 +74,16 @@ Description: ZMoveIroning for 3D prints. Z hop for ironing
 
 ![ZMoveIroning.py](./images/ZmoveIroning.jpg)
 
+[FanIroning.py](FanIroning.py)
+-----
+
+Description: FlowIroning for 3D prints. Change the Fan value on ironing operation.
+
+![FanIroning.py](./images/FanIroning.jpg)
+
+Note : Some Ironing area are not detected by the script. C'est principalement les zones de petites tailles situées sur des zones de contour.
+
+![Sample not detected area](./images/NotDetectedFanIroning.jpg)
 
 [RepRapPrintInfos.py](RepRapPrintInfos.py)
 -----
