@@ -81,7 +81,7 @@ Description: FlowIroning for 3D prints. Change the Fan value on ironing operatio
 
 ![FanIroning.py](./images/FanIroning.jpg)
 
-Note : Some Ironing area are not detected by the script. C'est principalement les zones de petites tailles situées sur des zones de contour.
+Note : Some Ironing area are not detected by the script. It is mainly the small areas located on contour areas.
 
 ![Sample not detected area](./images/NotDetectedFanIroning.jpg)
 
