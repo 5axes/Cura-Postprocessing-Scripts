@@ -32,6 +32,8 @@ class Section(Enum):
     INFILL = 4
     SKIN = 5
     SKIN2 = 6
+    PRIME_TOWER = 7
+    BRIDGE = 8
     
 
 
@@ -143,18 +145,22 @@ class FanIroning(Script):
         currentSection = Section.NOTHING
         set_ironing_fan_value = False
         current_Fan = 0
-
+        Fan_On = False
 
         for layer_index, layer in enumerate(data):
             lines = layer.split("\n")
             for line_index, currentLine in enumerate(lines):
-
-                if "M106" in currentLine and not set_ironing_fan_value :
+                # M107 - Set Fan Speed
+                if currentLine.startswith("M106")  and not set_ironing_fan_value :
                         searchM106 = re.search(r"S(\d*\.?\d*)", currentLine)
                         if searchM106:
                             current_Fan=int(searchM106.group(1))
                             Logger.log('d', 'current_Fan :' + str(current_Fan))
- 
+                            Fan_On = True
+                # M107 - Fan Off
+                if currentLine.startswith("M107") :
+                    Fan_On = False
+                
                 if is_begin_skin_segment_line(currentLine) and not (currentSection == Section.SKIN):
                     currentSection = Section.SKIN                 
                     continue
@@ -168,11 +174,14 @@ class FanIroning(Script):
                         # Logger.log('d', 'outPutLine :' + str(outPutLine))
                         outPutLine = currentLine + outPutLine 
                         lines[line_index] = outPutLine
-                    elif ";TYPE:" in currentLine:
+                    elif currentLine.startswith(";TYPE:"):
                         currentSection = Section.NOTHING                  
                         if set_ironing_fan_value :
                             set_ironing_fan_value = False
-                            outPutLine = "\nM106 S{:d}".format(current_Fan)
+                            if Fan_On == True :
+                                outPutLine = "\nM106 S{:d}".format(current_Fan)
+                            else:
+                                outPutLine = "\nM107"
                             # Logger.log('d', 'Reset A outPutLine :' + str(outPutLine))
                             outPutLine = currentLine + outPutLine 
                             lines[line_index] = outPutLine
@@ -180,12 +189,15 @@ class FanIroning(Script):
                 #
                 # comment like ;MESH:NONMESH 
                 #
-                if ";MESH:" in currentLine:
+                if currentLine.startswith(";MESH:"):
                     currentSection = Section.NOTHING
                     if set_ironing_fan_value :
                         set_ironing_fan_value = False
-                        outPutLine = "\nM106 S{:d}".format(current_Fan)
                         # Logger.log('d', 'Reset B outPutLine :' + str(outPutLine))
+                        if Fan_On == True :
+                            outPutLine = "\nM106 S{:d}".format(current_Fan)
+                        else:
+                            outPutLine = "\nM107"
                         outPutLine = currentLine + outPutLine 
                         lines[line_index] = outPutLine                       
                         
