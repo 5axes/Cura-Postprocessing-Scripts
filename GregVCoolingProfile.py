@@ -497,7 +497,7 @@ class GregVCoolingProfile(Script):
             lines = layer.split("\n")            
             for line in lines:
                 line_index = lines.index(line)
-                #Remove all the existing M106 lines from the gcode.
+                # Remove all the existing M106 lines from the gcode.
                 if line.startswith("M106"):
                     lines[line_index]=""
                           
@@ -509,6 +509,7 @@ class GregVCoolingProfile(Script):
                             index = data.index(layer)
                             for num in range(0, 23, 2):
                                 if fan_array[num] in line:
+                                    # Logger.log('d', 'fan_array : {}'.format(fan_array[num])) 
                                     lines[line_index] += "\n" + fan_array[num + 1]
                                     
                 elif by_layer_or_feature == "by_feature":
