@@ -263,6 +263,7 @@ class GregVCoolingProfile(Script):
         fan_array = []
         layer_number=0
         by_layer_or_feature = self.getSettingValueByKey("layer_or_feature")
+        
         if by_layer_or_feature == "by_layer":
             fan_first = self.getSettingValueByKey("fan_first")
             if fan_first == "": fan_first = "mt/mt"
@@ -502,7 +503,8 @@ class GregVCoolingProfile(Script):
         
         for layer in data:
             lines = layer.split("\n")            
-            for line in lines:                
+            for line in lines: 
+                line_index = lines.index(line)            
                 if by_layer_or_feature == "by_layer":
                     if ";LAYER:" in line:
                         layer_number = int(line.split(":")[1])
@@ -520,39 +522,38 @@ class GregVCoolingProfile(Script):
                     if layer_number >= int(the_start_layer) and layer_number < int(the_end_layer):  
                         index = data.index(layer)
                         if ";TYPE:SKIRT" in line:
-                            layer += "\n" + fan_sp_skirt
+                            lines[line_index] += "\n" + fan_sp_skirt
 
                         elif ";TYPE:WALL-INNER" in line:    
-                            layer += "\n" + fan_sp_wall_inner
+                            lines[line_index] += "\n" + fan_sp_wall_inner
 
                         elif ";TYPE:WALL-OUTER" in line:    
-                            layer += "\n" + fan_sp_wall_outer
+                            lines[line_index] += "\n" + fan_sp_wall_outer
 
                         elif ";TYPE:FILL" in line:    
-                            layer += "\n" + fan_sp_fill
+                            lines[line_index] += "\n" + fan_sp_fill
 
                         elif ";TYPE:SKIN" in line:    
-                            layer += "\n" + fan_sp_skin
+                            lines[line_index] += "\n" + fan_sp_skin
 
                         elif ";TYPE:SUPPORT" in line:    
-                            layer += "\n" + fan_sp_support
+                            lines[line_index] += "\n" + fan_sp_support
 
                         elif ";TYPE:SUPPORT-INTERFACE" in line:    
-                            layer += "\n" + fan_sp_support_interface
+                            lines[line_index] += "\n" + fan_sp_support_interface
 
                         elif ";TYPE:PRIME-TOWER" in line:    
-                            layer += "\n" + fan_sp_prime_tower
+                            lines[line_index] += "\n" + fan_sp_prime_tower
 
                         elif ";TYPE:BRIDGE" in line:    
-                            layer += "\n" + fan_sp_bridge
-                            
-                        data[index] = layer
-                        
+                            lines[line_index] += "\n" + fan_sp_bridge
+                                                  
                     elif layer_number == int(the_end_layer) and the_end_is_enabled == True:
-                        layer += "\n" + fan_sp_feature_final
+                        lines[line_index] += "\n" + fan_sp_feature_final
                         
                     if ";End of gcode" in line:
-                        layer += "\n" + "M106 S0"
+                        lines[line_index] += "\n" + "M106 S0"
 
-                        data[index] = layer
+            result = "\n".join(lines)
+            data[layer_index] = result
         return data
