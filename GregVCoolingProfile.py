@@ -253,11 +253,17 @@ class GregVCoolingProfile(Script):
         }"""
 
     def execute(self, data):
-        fan_mode = not Application.getInstance().getPrintInformation().machine_scale_fan_speed_zero_to_one   #Need to pull the setting {machine_scale_fan_speed_zero_to_one} from Cura 
-            #Fill the variables for Layer Cooling and add them to the "fan_array" list.  "mt" is used as place holder for empty slots.           
+    
+        extrud = Application.getInstance().getGlobalContainerStack().extruderList
+ 
+        fan_mode = not bool(extrud[0].getProperty("machine_scale_fan_speed_zero_to_one", "value")) #Need to pull the setting {machine_scale_fan_speed_zero_to_one} from Cura 
+        
+        # fan_mode = not Application.getInstance().getPrintInformation().machine_scale_fan_speed_zero_to_one   #Need to pull the setting {machine_scale_fan_speed_zero_to_one} from Cura 
+        # Fill the variables for Layer Cooling and add them to the "fan_array" list.  "mt" is used as place holder for empty slots.           
         fan_array = []
+        layer_number=0
         by_layer_or_feature = self.getSettingValueByKey("layer_or_feature")
-        if by_layer_or_feature == by_layer:
+        if by_layer_or_feature == "by_layer":
             fan_first = self.getSettingValueByKey("fan_first")
             if fan_first == "": fan_first = "mt/mt"
             fan_first = fan_first.split("/")
@@ -391,7 +397,7 @@ class GregVCoolingProfile(Script):
                 fan_array.append("M106 S" + str(round(int(fan_twelfth[1]) / 100, 1)))
                 
                 #Get the variables for the feature speeds and the start and the end layers                
-        elif by_layer_or_feature == by_feature:    
+        elif by_layer_or_feature == "by_feature":    
             the_start_layer = self.getSettingValueByKey("start_layer")
             the_end_layer = self.getSettingValueByKey("end_layer")
             fan_skirt = self.getSettingValueByKey("fan_skirt")
@@ -474,7 +480,7 @@ class GregVCoolingProfile(Script):
             else:
                 fan_sp_feature_final = "M106 S" + str(round(int(fan_feature_final) / 100, 1))
 
-            if the_end_layer > -1 and by_layer_or_feature == by_feature:
+            if the_end_layer > -1 and by_layer_or_feature == "by_feature":
                 the_end_is_enabled = True
 
             else:
@@ -497,7 +503,7 @@ class GregVCoolingProfile(Script):
         for layer in data:
             lines = layer.split("\n")            
             for line in lines:                
-                if by_layer_or_feature == by_layer:
+                if by_layer_or_feature == "by_layer":
                     if ";LAYER:" in line:
                         layer_number = int(line.split(":")[1])
                         if (layer_number >= int(the_start_layer)) and layer_number <= int(the_end_layer):  
@@ -507,7 +513,7 @@ class GregVCoolingProfile(Script):
                                     layer += "\n" + fan_array[num + 1]
                                     data[index] = layer
                                     
-                elif by_layer_or_feature == by_feature:
+                elif by_layer_or_feature == "by_feature":
                     if ";LAYER:" in line:
                         layer_number = int(line.split(":")[1])
                         
