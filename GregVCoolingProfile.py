@@ -509,8 +509,7 @@ class GregVCoolingProfile(Script):
                             index = data.index(layer)
                             for num in range(0, 23, 2):
                                 if fan_array[num] in line:
-                                    layer += "\n" + fan_array[num + 1]
-                                    data[index] = layer
+                                    lines[line_index] += "\n" + fan_array[num + 1]
                                     
                 elif by_layer_or_feature == "by_feature":
                     if ";LAYER:" in line:
