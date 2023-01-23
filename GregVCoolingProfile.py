@@ -11,7 +11,9 @@
 #    This loads but doesn't work.
 
 from ..Script import Script
+from UM.Logger import Logger
 from UM.Application import Application
+import re #To perform the search
 
 class GregVCoolingProfile(Script):
     def __init__(self):
@@ -489,22 +491,17 @@ class GregVCoolingProfile(Script):
 
             if the_end_layer == -1 or the_end_is_enabled == False:
                 the_end_layer = "299792458000"
-
-                #Remove all the existing M106 lines from the gcode.
-                # Insert the speeds for the defined layers
+     
         for layer in data:
+            layer_index = data.index(layer)
             lines = layer.split("\n")            
-            index = data.index(layer)
-            
             for line in lines:
-                if "M106" in line:
-                    line = ""
-                    data[index] = layer
-        
-        for layer in data:
-            lines = layer.split("\n")            
-            for line in lines: 
-                line_index = lines.index(line)            
+                line_index = lines.index(line)
+                #Remove all the existing M106 lines from the gcode.
+                if line.startswith("M106"):
+                    lines[line_index]=""
+                          
+                            
                 if by_layer_or_feature == "by_layer":
                     if ";LAYER:" in line:
                         layer_number = int(line.split(":")[1])
@@ -527,8 +524,10 @@ class GregVCoolingProfile(Script):
                         elif ";TYPE:WALL-INNER" in line:    
                             lines[line_index] += "\n" + fan_sp_wall_inner
 
-                        elif ";TYPE:WALL-OUTER" in line:    
+                        elif ";TYPE:WALL-OUTER" in line: 
+                            # Logger.log('d', 'line_index : {}'.format(lines[line_index]))                        
                             lines[line_index] += "\n" + fan_sp_wall_outer
+                            # Logger.log('d', 'line_index : {}'.format(lines[line_index]))
 
                         elif ";TYPE:FILL" in line:    
                             lines[line_index] += "\n" + fan_sp_fill
