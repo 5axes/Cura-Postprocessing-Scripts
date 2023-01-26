@@ -1,28 +1,21 @@
-# January 2023 by GregValiant (Greg Foresi)
-#Design Scope
-#    Remove or comment out any existing M106 lines from the file. (I didn't figure that out so there is no code for that yet)
-#    Import the {machine_scale_fan_speed_zero_to_one} setting from Cura to set the "fan_mode" variable.
-#    Collect the values from the dialog
+# January 2023 by GregValiant (Greg Foresi) with help from 5axes.
+#Functions:
+#    Remove all existing M106 lines from the file.
 #    Enter either the Layer fan speeds (at ";LAYER:") or the Feature fan speeds (at ;TYPE:WALL-OUTER, etc.).
-#    If the user declares an Ending Layer and By Feature is selected then the final fan speed is entered at that last layer.
-#    An M106 S0 would need to be added at the ";End of Gcode" line in the file.
-#    It would be nice to have a method to clear all the "By Layer" boxes as "enabled" counts on the previous box having text in it.
-#Current state:
-#    This loads but doesn't work.
 
 from ..Script import Script
 from UM.Logger import Logger
 from UM.Application import Application
-import re #To perform the search
+import re
 
-class GregVCoolingProfile5axes(Script):
+class AddCoolingProfile(Script):
     def __init__(self):
         super().__init__()
 
     def getSettingDataString(self):
         return """{
-            "name": "GV and 5axes Cooling profile",
-            "key": "GregVCoolingProfile5axes",
+            "name": "Add a Cooling Profile",
+            "key": "AddCoolingProfile",
             "metadata": {},
             "version": 2,
             "settings":
@@ -34,16 +27,14 @@ class GregVCoolingProfile5axes(Script):
                     "type": "enum",
                     "options": {
                         "by_layer": "Layer Numbers",
-                        "by_feature": "Feature Type",
-                        "supress_fan": "Supress Fan Value"
-                        },
+                        "by_feature": "Feature Type"},
                     "default_value": "by_layer"
                 },
                 "fan_start_layer":
                 {
                     "label": "Starting Layer",
                     "description": "Layer to start the insertion at.",
-                    "type": "int",
+                    "type": "str",
                     "default_value": 0,
                     "minimum_value": 0,
                     "enabled": "fan_layer_or_feature == 'by_feature'"
@@ -52,7 +43,7 @@ class GregVCoolingProfile5axes(Script):
                 {
                     "label": "Ending Layer",
                     "description": "Layer to end the insertion at.  Enter -1 for the entire file or enter a layer number.  If using By Feature and you set an End Layer then you must set the Final % that will finish the file",
-                    "type": "int",
+                    "type": "str",
                     "default_value": -1,
                     "minimum_value": -1,
                     "enabled": "fan_layer_or_feature == 'by_feature'"
@@ -251,7 +242,7 @@ class GregVCoolingProfile5axes(Script):
                     "default_value": 50,
                     "minimum_value": 0,
                     "maximum_value": 100,
-                    "enabled": "fan_end_layer > -1 and fan_layer_or_feature == 'by_feature'"
+                    "enabled": "(fan_end_layer != -1) and (fan_layer_or_feature == 'by_feature')"
                 }
             }
         }"""
@@ -508,9 +499,9 @@ class GregVCoolingProfile5axes(Script):
                     fan_array[23] = "M106 S" + str(round(int(fan_twelfth_p) / 100, 1))
                               
         elif by_layer_or_feature == "by_feature":    #Get the variables for the feature speeds and the start and the end layers  
-            the_start_layer = int(self.getSettingValueByKey("fan_start_layer"))
-            the_end_layer = int(self.getSettingValueByKey("fan_end_layer"))
-            fan_skirt = int(self.getSettingValueByKey("fan_skirt"))
+            the_start_layer = self.getSettingValueByKey("fan_start_layer")
+            the_end_layer = self.getSettingValueByKey("fan_end_layer")
+            fan_skirt = self.getSettingValueByKey("fan_skirt")
             if fan_mode:
                 fan_sp_skirt = "M106 S" + str(round(fan_skirt * 2.55))
             else:
@@ -570,84 +561,84 @@ class GregVCoolingProfile5axes(Script):
             else:
                 fan_sp_feature_final = "M106 S" + str(round(fan_feature_final / 100, 1))
 
-            if the_end_layer > -1 and by_layer_or_feature == "by_feature":
+            if int(the_end_layer) > int("-1") and by_layer_or_feature == "by_feature":
                 the_end_is_enabled = True
             else:
                 the_end_is_enabled = False
 
-            if the_end_layer == -1 or the_end_is_enabled == False:
-                the_end_layer = 9999999999
+            if int(the_end_layer) == int("-1") or the_end_is_enabled == False:
+                the_end_layer = "9999999999"
         
-        layer_number = 0
-        # supress every M106 present in the Gcode
+        index = 1
+        end_time = ""
+        quit_line = ";TIME_ELAPSED:a"
+        quit_bool = False
         for layer in data:
             modified_data = ""
             index = data.index(layer)
-            lines = layer.split("\n")            
+            lines = layer.split("\n")    
             for line in lines:
-                if not line.startswith("M106"):
-                    modified_data += line 
-                    modified_data += "\n"
-            # Supress the last "\n"
-            if modified_data.endswith("\n") :
-                modified_data = modified_data[0:len(modified_data)-2]
+                if quit_line in line:
+                    quit_bool = True
+                if ";TIME:" in line:
+                    end_time = str(line.split(":")[1])
+                    end_time = str(end_time.split(".")[0])
+                    quit_line = ";TIME_ELAPSED:" + str(end_time)
+                if quit_bool == False:
+                    if not line.startswith("M106") and quit_bool == False:
+                        modified_data += line + "\n"
+                else:
+                    modified_data += line + "\n"
             data[index] = modified_data
 
+        layer_number = "0"
         if by_layer_or_feature == "by_layer":
-            layer_number=0
             for layer in data:
-                index = data.index(layer)
                 fan_lines = layer.split("\n")
                 for fan_line in fan_lines:
                     if ";LAYER:" in fan_line:
-                        layer_number = int(fan_line.split(":")[1])
+                        layer_number = str(fan_line.split(":")[1])
                         index = data.index(layer)
                         for num in range(0,23,2):
-                            if layer_number == int(fan_array[num]):
+                            if layer_number == fan_array[num]:
                                 layer = fan_array[num + 1] + "\n" + layer
                                 data[index] = layer
-                                
+                        
+        layer_number = "0"
+        index = 1
+        layer_index = 0
         if by_layer_or_feature == "by_feature":
-            layer_number=0
             for layer in data:
                 modified_data = ""
-                index = data.index(layer)
-                Logger.log('d', 'Index : {}'.format(index)) 
                 lines = layer.split("\n")
-                
                 for line in lines:
                     modified_data += line + "\n"
-                    if line.startswith(";LAYER:") :
-                        index = data.index(layer)
-                        layer_number = int(line.split(":")[1])
-                        Logger.log('d', 'layer_number : {}'.format(layer_number)) 
-                    if layer_number >= the_start_layer and layer_number < the_end_layer:
-                        if line.startswith(";TYPE:SKIRT") :
+                    if ";LAYER:" in line:
+                        layer_number = str(line.split(":")[1])
+                    if int(layer_number) >= int(the_start_layer) and int(layer_number) <= int(the_end_layer):
+                        if ";TYPE:SKIRT" in line:
                             modified_data += fan_sp_skirt + "\n"
-                        elif line.startswith(";TYPE:WALL-INNER") :
+                        elif ";TYPE:WALL-INNER" in line:
                             modified_data += fan_sp_wall_inner + "\n"
-                        elif line.startswith(";TYPE:WALL-OUTER") :
+                        elif ";TYPE:WALL-OUTER" in line:
                             modified_data += fan_sp_wall_outer + "\n"
-                        elif line.startswith(";TYPE:FILL") :
+                        elif ";TYPE:FILL" in line:
                             modified_data += fan_sp_fill + "\n"
-                        elif line.startswith(";TYPE:SKIN") :
+                        elif ";TYPE:SKIN" in line:
                             modified_data += fan_sp_skin + "\n"
-                        elif line.startswith(";TYPE:SUPPORT") :
+                        elif ";TYPE:SUPPORT" in line:
                             modified_data += fan_sp_support + "\n"
-                        elif line.startswith(";TYPE:SUPPORT-INTERFACE") :
+                        elif ";TYPE:SUPPORT-INTERFACE" in line:
                             modified_data += fan_sp_support_interface + "\n"
-                        elif line.startswith(";TYPE:PRIME-TOWER") :
+                        elif ";TYPE:PRIME-TOWER" in line:
                             modified_data += fan_sp_prime_tower + "\n"
-                        elif line.startswith(";TYPE:BRIDGE") :
+                        elif ";TYPE:BRIDGE" in line:
                             modified_data += fan_sp_bridge + "\n"
-                        elif layer_number == the_end_layer and the_end_is_enabled == True:
-                            modified_data += fan_sp_feature_final + "\n"
-                        elif line.startswith(";End of Gcode") :
-                            modified_data += "M106 S0" + "\n"
-                # Supress the last "\n"
-                if modified_data.endswith("\n") :
-                    modified_data = modified_data[0:len(modified_data)-2]                
-                data[index] = modified_data
-                
-        
+                    if line == ";LAYER:" + str(int(the_end_layer) + 1)  and the_end_is_enabled == True:
+                        modified_data += fan_sp_feature_final + "\n"
+                    if ";End of Gcode" in line:
+                        modified_data += "M106 S0" + "\n"
+                if modified_data.endswith("\n"): modified_data = modified_data[0:len(modified_data) - 2]
+                data[layer_index] = modified_data
+                layer_index +=1
         return data
