@@ -23,7 +23,7 @@ class AddCoolingProfile(Script):
                 "fan_layer_or_feature":
                 {
                     "label": "Cooling Profile by:",
-                    "description": "By Layer number or by Feature (Walls, Skins, Support, etc.).  Minimum Fan Percentage is 15%.",
+                    "description": "By Layer number or by Feature (Walls, Skins, Support, etc.).  Minimum Fan Percentage is 15%.  If using By Layer and you want to start at Layer:0 then you must turn Cooling off in Cura.",
                     "type": "enum",
                     "options": {
                         "by_layer": "Layer Numbers",
@@ -242,11 +242,11 @@ class AddCoolingProfile(Script):
                     "default_value": 50,
                     "minimum_value": 0,
                     "maximum_value": 100,
-                    "enabled": "(fan_end_layer != -1) and (fan_layer_or_feature == 'by_feature')"
+                    "enabled": "(int(fan_end_layer) != -1) and (fan_layer_or_feature == 'by_feature')"
                 }
             }
         }"""
-
+#    Set up the variables
     def execute(self, data):
         fan_first_l = "0"
         fan_first_p = "0"
@@ -275,8 +275,7 @@ class AddCoolingProfile(Script):
         fan_mode = True
         extrud = Application.getInstance().getGlobalContainerStack().extruderList
  
-        fan_mode = not bool(extrud[0].getProperty("machine_scale_fan_speed_zero_to_one", "value")) #Need to pull the setting {machine_scale_fan_speed_zero_to_one} from Cura  not Application.getInstance().getPrintInformation().machine_scale_fan_speed_zero_to_one   #Need to pull the setting {machine_scale_fan_speed_zero_to_one} from Cura 
-            #Fill the variables for Layer Cooling and add them to the "fan_array" list.  "mt" is used as place holder for empty slots.           
+        fan_mode = not bool(extrud[0].getProperty("machine_scale_fan_speed_zero_to_one", "value"))
         fan_array = []
         for q in range(0,24,1):
             fan_array.append("mt")
@@ -568,7 +567,7 @@ class AddCoolingProfile(Script):
 
             if int(the_end_layer) == int("-1") or the_end_is_enabled == False:
                 the_end_layer = "9999999999"
-        
+        #Strip the existing M106 lines from the file.  Leave the one in the End Gcode.
         index = 1
         end_time = ""
         quit_line = ";TIME_ELAPSED:a"
@@ -590,7 +589,7 @@ class AddCoolingProfile(Script):
                 else:
                     modified_data += line + "\n"
             data[index] = modified_data
-
+        #The "By Layer" section
         layer_number = "0"
         if by_layer_or_feature == "by_layer":
             for layer in data:
@@ -603,7 +602,7 @@ class AddCoolingProfile(Script):
                             if layer_number == fan_array[num]:
                                 layer = fan_array[num + 1] + "\n" + layer
                                 data[index] = layer
-                        
+        #The "By Feature" section
         layer_number = "0"
         index = 1
         layer_index = 0
@@ -636,8 +635,6 @@ class AddCoolingProfile(Script):
                             modified_data += fan_sp_bridge + "\n"
                     if line == ";LAYER:" + str(int(the_end_layer) + 1)  and the_end_is_enabled == True:
                         modified_data += fan_sp_feature_final + "\n"
-                    if ";End of Gcode" in line:
-                        modified_data += "M106 S0" + "\n"
                 if modified_data.endswith("\n"): modified_data = modified_data[0:len(modified_data) - 2]
                 data[layer_index] = modified_data
                 layer_index +=1

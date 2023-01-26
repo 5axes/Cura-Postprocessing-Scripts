@@ -30,7 +30,7 @@ class GregVInsertAtLayerChange(Script):
                     "label": "How often to insert",
                     "description": "Every so many layers starting with the Start Layer.",
                     "type": "enum",
-                    "options": {"every_layer": "Every Layer", "every_second": "Every 2nd", "every_third": "Every 3rd", "every_fifth": "Every 5th", "every_tenth": "Every 10th", "every_XXV": "Every 25th", "every_L": "Every 50th", "every_C": "Every 100th"},
+                    "options": {"once_only": "One insertion only", "every_layer": "Every Layer", "every_second": "Every 2nd", "every_third": "Every 3rd", "every_fifth": "Every 5th", "every_tenth": "Every 10th", "every_XXV": "Every 25th", "every_L": "Every 50th", "every_C": "Every 100th"},
                     "default_value": "every_layer"
                 },
                 "start_layer":
@@ -39,14 +39,16 @@ class GregVInsertAtLayerChange(Script):
                     "description": "Layer to start the insertion at.",
                     "type": "int",
                     "default_value": 0,
-                    "minimum_value": 0
+                    "minimum_value": 0,
+                    "enabled": "insert_frequency != 'once_only'"
                 },
                 "end_layer_enabled":
                 {
                     "label": "Enable End Layer",
                     "description": "Check to use an ending layer for the insertion.",
                     "type": "bool",
-                    "default_value": false
+                    "default_value": false,
+                    "enabled": "insert_frequency != 'once_only'"
                 },
                 "end_layer":
                 {
@@ -54,7 +56,15 @@ class GregVInsertAtLayerChange(Script):
                     "description": "Layer to end the insertion at. Enter 'End' for entire file (or disable this setting).",
                     "type": "str",
                     "default_value": "End",
-                    "enabled": "end_layer_enabled"
+                    "enabled": "end_layer_enabled and insert_frequency != 'once_only'"
+                },
+                "single_end_layer":
+                {
+                    "label": "Layer # for Single Insertion",
+                    "description": "Layer for a single insertion of the Gcode.",
+                    "type": "str",
+                    "default_value": "",
+                    "enabled": "insert_frequency == 'once_only'"
                 },
                 "gcode_to_add":
                 {
@@ -71,6 +81,7 @@ class GregVInsertAtLayerChange(Script):
         the_start_layer = self.getSettingValueByKey("start_layer")
         the_end_layer = self.getSettingValueByKey("end_layer")
         the_end_is_enabled = self.getSettingValueByKey("end_layer_enabled")
+        when_to_insert = self.getSettingValueByKey("insert_frequency")
         start_here = False
         RealNum = 0
         
@@ -86,44 +97,66 @@ class GregVInsertAtLayerChange(Script):
         else:
             gcode_to_add = MyCode + "\n"
             
-        if self.getSettingValueByKey("insert_frequency") == "every_layer":
+        if when_to_insert == "every_layer":
             freq = 1
         
-        if self.getSettingValueByKey("insert_frequency") == "every_second":
+        if when_to_insert == "every_second":
             freq = 2
             
-        if self.getSettingValueByKey("insert_frequency") == "every_third":
+        if when_to_insert == "every_third":
             freq = 3
             
-        if self.getSettingValueByKey("insert_frequency") == "every_fifth":
+        if when_to_insert == "every_fifth":
             freq = 5
             
-        if self.getSettingValueByKey("insert_frequency") == "every_tenth":
+        if when_to_insert == "every_tenth":
             freq = 10 
             
-        if self.getSettingValueByKey("insert_frequency") == "every_XXV":
+        if when_to_insert == "every_XXV":
             freq = 25
             
-        if self.getSettingValueByKey("insert_frequency") == "every_L":
+        if when_to_insert == "every_L":
             freq = 50
             
-        if self.getSettingValueByKey("insert_frequency") == "every_C":
+        if when_to_insert == "every_C":
             freq = 100
+            
+        if when_to_insert == "once_only":
+            the_search_layer = self.getSettingValueByKey("single_end_layer")
         
-        for layer in data:
-            lines = layer.split("\n")            
-            for line in lines:
-                if ";LAYER:" in line:
-                    layer_number = int(line.split(":")[1])
-                    if (layer_number >= int(the_start_layer)) and layer_number <= int(the_end_layer):
+        index = 0
+        if when_to_insert == "once_only":
+            for layer in data:
+                lines = layer.split("\n")
+                for line in lines:
+                    if ";LAYER:" in line:
+                        layer_number = int(line.split(":")[1])
+                        if layer_number == int(the_search_layer):
+                            index = data.index(layer)
+                            if self.getSettingValueByKey("insert_location") == "before":
+                                layer = gcode_to_add + layer
+                            else:
+                                layer = layer + gcode_to_add
+
+                            data[index] = layer
+                            break    
+
+        if when_to_insert != "once_only":
+            for layer in data:
+                lines = layer.split("\n")                
+                for line in lines:
+                    if ";LAYER:" in line:
+                        layer_number = int(line.split(":")[1])
+                        if layer_number >= int(the_start_layer) and layer_number <= int(the_end_layer):
                             index = data.index(layer)
                             RealNum = layer_number - int(the_start_layer)
-                            if int(RealNum  / freq) - (RealNum / freq) == 0:
+                            if int(RealNum / freq) - (RealNum / freq) == 0:
                                 if self.getSettingValueByKey("insert_location") == "before":
                                     layer = gcode_to_add + layer
                                 else:
                                     layer = layer + gcode_to_add
-
-                            data[index] = layer
-                            break
+                                        
+                                data[index] = layer
+                                break
+        
         return data
