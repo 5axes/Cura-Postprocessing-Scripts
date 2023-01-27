@@ -1,6 +1,19 @@
-# Custom Time Lapse
+#------------------------------------------------------------------------------------------------------------------------------------
+#
+# Cura PostProcessing Script Custom Time Lapse
+# Author       :     ????
+# Modification :     Arpadvezer1 : https://github.com/Arpadvezer1
+# Date         :     January 31, 2023
+#
+# Description  :  CustomTimelapse
+#
+#
+#------------------------------------------------------------------------------------------------------------------------------------
 
 from ..Script import Script
+from UM.Logger import Logger
+
+__version__ = '1.0'
 
 class CustomTimeLapse(Script):
     def __init__(self):
@@ -8,12 +21,19 @@ class CustomTimeLapse(Script):
 
     def getSettingDataString(self):
         return """{
-            "name": "Custom Time Lapse",
+            "name": "Custom timelapse",
             "key": "CustomTimeLapse",
             "metadata": {},
             "version": 2,
             "settings":
             {
+                "activate_plugin":
+                {
+                    "label": "Enable plugin",
+                    "description": "Select if you want the plugin to be active (allows you to desactivate without losing your configuration)",
+                    "type": "bool",
+                    "default_value": true
+                },
                 "first_gcode":
                 {
                     "label": "GCODE for the first position(display position).",
@@ -28,6 +48,21 @@ class CustomTimeLapse(Script):
                     "type": "str",
                     "default_value": "G0 X235"
                 },
+                "enable_custom_return_speed":
+                {
+                    "label": "Specify a return speed",
+                    "description": "Set the value below",
+                    "type": "bool",
+                    "default_value": false
+                },
+                "return_speed":
+                {
+                    "label": "return speed in mm/minutes",
+                    "description": "return speed in mm/minute as for the F gcode parameter.",
+                    "type": "int",
+                    "unit": "mm/m",
+                    "enabled": "enable_custom_return_speed"
+                },
                 "pause_length":
                 {
                     "label": "Pause length",
@@ -36,15 +71,6 @@ class CustomTimeLapse(Script):
                     "default_value": 700,
                     "minimum_value": 0,
                     "unit": "ms"
-                },
-                "z_retract":
-                {
-                    "label": "Z retract",
-                    "description": "Z retraction (in mm).",
-                    "type": "float",
-                    "default_value": 1,
-                    "minimum_value": 0,
-                    "unit": "mm"
                 },
                 "enable_retraction":
                 {
@@ -62,15 +88,6 @@ class CustomTimeLapse(Script):
                     "default_value": 5,
                     "enabled": "enable_retraction"
                 },
-                "retraction_speed":
-                {
-                    "label": "Retraction speed",
-                    "description": "Define retraction speed to retract the filament.",
-                    "unit": "mm/s",
-                    "type": "float",
-                    "default_value": 50,
-                    "enabled": "enable_retraction"
-                },
                 "display_photo_number":
                 {
                     "label": "Display current photo number",
@@ -81,7 +98,7 @@ class CustomTimeLapse(Script):
                 "send_photo_command":
                 {
                     "label": "Send camera command",
-                    "description": "Send camera command defined in Trigger camera command",
+                    "description": "Send a customisable G-code command for compatible printers",
                     "type": "bool",
                     "default_value": false
                 },
@@ -95,7 +112,6 @@ class CustomTimeLapse(Script):
                 }
             }
         }"""
-        
     # Note : This function and some other bits of code comes from PauseAtHeight.py
     ##  Get the X and Y values for a layer (will be used to get X and Y of the
     #   layer after the pause).
@@ -109,16 +125,14 @@ class CustomTimeLapse(Script):
         return 0, 0
 
     def execute(self, data):
-        max_layer = 0
+        activate_plugin = self.getSettingValueByKey("activate_plugin")
         first_gcode = self.getSettingValueByKey("first_gcode")
         second_gcode = self.getSettingValueByKey("second_gcode")
         pause_length = self.getSettingValueByKey("pause_length")
-        z_retraction = self.getSettingValueByKey("z_retract")
+        enable_custom_return_speed = self.getSettingValueByKey("enable_custom_return_speed")
+        return_speed = self.getSettingValueByKey("return_speed")
         enable_retraction = self.getSettingValueByKey("enable_retraction")
         retraction_distance = self.getSettingValueByKey("retraction_distance")
-        retraction_speed = self.getSettingValueByKey("retraction_speed")
-        retraction_speed = retraction_speed * 60
-        
         display_photo_number = self.getSettingValueByKey("display_photo_number")
         send_photo_command = self.getSettingValueByKey("send_photo_command")
         trigger_command = self.getSettingValueByKey("trigger_command")
@@ -127,9 +141,6 @@ class CustomTimeLapse(Script):
             # Check that a layer is being printed
             lines = layer.split("\n")
             for line in lines:
-                if line.startswith(";LAYER_COUNT:"):
-                    max_layer = int(line.split(":")[1])   # Recuperation Nb Layer Maxi
-                    
                 if ";LAYER:" in line:
                     index = data.index(layer)
 
@@ -138,52 +149,46 @@ class CustomTimeLapse(Script):
 
                     gcode_to_append = ""
 
-                    gcode_to_append += "; CustomTimelapse Begin\n"
+                    if activate_plugin:
+                        gcode_to_append += ";CustomTimelapse Begin\n"
 
-                    if display_photo_number:
-                        gcode_to_append += "M117 Photo " + str(layerIndex) + "\n"
-                    
-                    if enable_retraction:
+                        if display_photo_number:
+                            gcode_to_append += "M117 Taking photo " + str(layerIndex) + "...\n"
+
                         gcode_to_append += "; STEP 1 : retraction\n"
-                        gcode_to_append += self.putValue(M = 83) + " ; Switch to relative E values for any needed retraction\n"
-                        gcode_to_append += self.putValue(G = 1, F = retraction_speed, E = -retraction_distance) + " ; Retraction\n"
-                        gcode_to_append += self.putValue(M = 82) + " ; Switch back to absolute E values\n"
+                        gcode_to_append += self.putValue(M = 83) + " ; switch to relative E values for any needed retraction\n"
+                        if enable_retraction:
+                            gcode_to_append += self.putValue(G = 1, F = 1800, E = -retraction_distance) + ";Retraction\n"
+                        gcode_to_append += self.putValue(M = 82) + ";Switch back to absolute E values\n"
 
-                    gcode_to_append += "; STEP 2 : Move the head up a bit\n"
-                    gcode_to_append += self.putValue(G = 91) + " ; Switch to relative positioning\n"
-                    gcode_to_append += self.putValue(G = 0, Z = z_retraction) + " ; Move Z axis up a bit\n"
-                    gcode_to_append += self.putValue(G = 90) + " ; Switch back to absolute positioning\n"
+                        gcode_to_append += "; STEP 2 : Move the head up a bit\n"
+                        gcode_to_append += self.putValue(G = 91) + ";Switch to relative positioning\n"
+                        gcode_to_append += self.putValue(G = 0, Z = 1) + ";Move Z axis up a bit\n"
+                        gcode_to_append += self.putValue(G = 90) + ";Switch back to absolute positioning\n"
 
-                    gcode_to_append += "; STEP 3 : Move the head to \"display\" position and wait\n"
-                    gcode_to_append += first_gcode + " ; GCODE for the first position(display position)\n"
-                    gcode_to_append += second_gcode + " ; GCODE for the second position(trigger position)\n"
-                    gcode_to_append += self.putValue(M = 400) + " ; Wait for moves to finish\n"
-                    gcode_to_append += self.putValue(G = 4, P = pause_length) + " ; Pause\n"
+                        gcode_to_append += "; STEP 3 : Move the head to \"display\" position and wait\n"
+                        gcode_to_append += first_gcode + ";GCODE for the first position(display position)\n"
+                        gcode_to_append += second_gcode + ";GCODE for the second position(trigger position)\n"
+                        gcode_to_append += self.putValue(M = 400) + ";Wait for moves to finish\n"
+                        gcode_to_append += self.putValue(G = 4, P = pause_length) + ";Wait for camera\n"
 
-                    gcode_to_append += "; STEP 4 : send photo trigger command if set\n"
-                    if send_photo_command:
-                        gcode_to_append += trigger_command + " ; Snap Photo\n"
-                        gcode_to_append += self.putValue(G = 4, P = pause_length) + " ; Wait for camera\n"
+                        gcode_to_append += "; STEP 4 : send photo trigger command if set\n"
+                        if send_photo_command:
+                            gcode_to_append += trigger_command + " ;Snap Photo\n"
 
-                    gcode_to_append += self.putValue(M = 211, S=1) + " ; Turn on soft stops\n"
-
-                    # Skip steps 5 and 6 for the last layer
-                    if layerIndex <= max_layer :
+                        # TODO skip steps 5 and 6 for the last layer
                         gcode_to_append += "; STEP 5 : Move the head back in its original place\n"
-                        gcode_to_append += self.putValue(G = 0, X = x, Y = y) + "\n"
+                        if enable_custom_return_speed:
+                            gcode_to_append += self.putValue(G = 0, X = x, Y = y, F = return_speed) + "\n"
+                        else:
+                            gcode_to_append += self.putValue(G = 0, X = x, Y = y) + "\n"
 
                         gcode_to_append += "; STEP 6 : Move the head height back down\n"
-                        gcode_to_append += self.putValue(G = 91) + " ; Switch to relative positioning\n"
-                        gcode_to_append += self.putValue(G = 0, Z = -z_retraction) + " ; Restore Z axis position\n"
-                        gcode_to_append += self.putValue(G = 90) + " ; Switch back to absolute positioning\n"
+                        gcode_to_append += self.putValue(G = 91) + ";Switch to relative positioning\n"
+                        gcode_to_append += self.putValue(G = 0, Z = -1) + ";Restore Z axis position\n"
+                        gcode_to_append += self.putValue(G = 90) + ";Switch back to absolute positioning\n"
 
-                        if enable_retraction:
-                            gcode_to_append += "; STEP 7 : reset extruder position\n"
-                            gcode_to_append += self.putValue(M = 83) + " ; Switch to relative E values to reset extruder position\n"
-                            gcode_to_append += self.putValue(G = 1, F = retraction_speed, E = retraction_distance) + " ; Reset extruder position\n"
-                            gcode_to_append += self.putValue(M = 82) + " ; Switch back to absolute E values\n"
-                    
-                    gcode_to_append += "; CustomTimelapse End\n"
+                        gcode_to_append += ";CustomTimelapse End\n"
 
 
                     layer += gcode_to_append

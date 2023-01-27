@@ -1,8 +1,9 @@
 #------------------------------------------------------------------------------------------------------------------------------------
 #
-# Cura PostProcessing Script
-# Author :     Arpadvezer1 :https://github.com/Arpadvezer1
-# Date   :     January 31, 2023
+# Cura PostProcessing Script Custom Time Lapse
+# Author       :     ????
+# Modification :     Arpadvezer1 : https://github.com/Arpadvezer1
+# Date         :     January 31, 2023
 #
 # Description  :  CustomTimelapse
 #
@@ -10,19 +11,18 @@
 #------------------------------------------------------------------------------------------------------------------------------------
 
 from ..Script import Script
-from UM.Application import Application
 from UM.Logger import Logger
 
-__version__ = '1.6'
+__version__ = '1.0'
 
-class CustomTimelapse(Script):
+class CustomTimeLapse(Script):
     def __init__(self):
         super().__init__()
 
     def getSettingDataString(self):
         return """{
             "name": "Custom timelapse",
-            "key": "CustomTimelapse",
+            "key": "CustomTimeLapse",
             "metadata": {},
             "version": 2,
             "settings":
