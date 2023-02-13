@@ -108,14 +108,14 @@ class ZMoveG0(Script):
                     searchZ = re.search(r"Z(\d*\.?\d*)", currentLine)
                     if searchZ:
                         current_z=float(searchZ.group(1))
-                        Zr = "Z"+searchZ.group(1)
+                        Zc = "Z"+searchZ.group(1)
 
 
                 if currentLine.startswith("G0") and not In_G0 :
                     Output_Z=current_z+retraction_hop
                     outPutLine1 = "G1 F{} Z{:.3f}\n".format(speed_z_hop,Output_Z)
-                    Logger.log('d', "Zc Zr : {} {}".format(Zc,Zr))
-                    Zc = "Z{:.3f}\n".format(Output_Z)    
+                    # Logger.log('d', "Zc Zr : {} {}".format(Zc,Zr))
+                    Zr = "Z{:.3f}\n".format(Output_Z)    
                     currentLine=currentLine.replace(Zc, Zr)
                     outPutLine = outPutLine1 + currentLine 
                     lines[line_index] = outPutLine
