@@ -115,7 +115,7 @@ class ZMoveG0(Script):
                     Output_Z=current_z+retraction_hop
                     outPutLine1 = "G1 F{} Z{:.3f}\n".format(speed_z_hop,Output_Z)
                     # Logger.log('d', "Zc Zr : {} {}".format(Zc,Zr))
-                    Zr = "Z{:.3f}\n".format(Output_Z)    
+                    Zr = "Z{:.3f}".format(Output_Z)    
                     currentLine=currentLine.replace(Zc, Zr)
                     outPutLine = outPutLine1 + currentLine 
                     lines[line_index] = outPutLine
