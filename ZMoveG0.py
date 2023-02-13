@@ -73,6 +73,9 @@ class ZMoveG0(Script):
     def execute(self, data):
 
         current_z = 0
+        Zr = "Z0"
+        Zc = "Z0"
+        
         extruder_id  = self.getSettingValueByKey("extruder_nb")
         extruder_id = extruder_id -1
 
@@ -94,27 +97,35 @@ class ZMoveG0(Script):
             Logger.log('d', 'Mode Z Hop must not be activated')
             Message('Mode Z Hop must not be activated', title = catalog.i18nc("@info:title", "Post Processing")).show()
             return None
-
+            
+        In_G0 = False
         for layer_index, layer in enumerate(data):
             lines = layer.split("\n")
+            
             for line_index, currentLine in enumerate(lines):
 
                 if currentLine.startswith("G0") and "Z" in currentLine :
                     searchZ = re.search(r"Z(\d*\.?\d*)", currentLine)
                     if searchZ:
                         current_z=float(searchZ.group(1))
-                    # Logger.log('d', 'CurZ :' + str(current_z))
+                        Zr = "Z"+searchZ.group(1)
 
-                if currentLine.startswith("G0") :
+
+                if currentLine.startswith("G0") and not In_G0 :
                     Output_Z=current_z+retraction_hop
                     outPutLine1 = "G1 F{} Z{:.3f}\n".format(speed_z_hop,Output_Z)
-                    Zc = "Z{:.3f}".format(current_z)
-                    Zr = "Z{:.3f}".format(Output_Z)
+                    Logger.log('d', "Zc Zr : {} {}".format(Zc,Zr))
+                    Zc = "Z{:.3f}\n".format(Output_Z)    
                     currentLine=currentLine.replace(Zc, Zr)
-                    outPutLine2 = "\nG1 F{} Z{:.3f}".format(speed_z_hop,current_z)
-                    outPutLine = outPutLine1 + currentLine + outPutLine2 
+                    outPutLine = outPutLine1 + currentLine 
                     lines[line_index] = outPutLine
-                        
+                    In_G0 = True
+                
+                if currentLine.startswith("G1") and In_G0 :  
+                    outPutLine2 = "G1 F{} Z{:.3f}\n".format(speed_z_hop,current_z)                
+                    outPutLine = outPutLine2 + currentLine
+                    lines[line_index] = outPutLine
+                    In_G0 = False
                 #
                 # end of analyse
                 #
