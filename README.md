@@ -237,7 +237,7 @@ Note : In GCode turn off the print cooling fan. [M107](https://marlinfw.org/docs
 
 Description: Z hop for every G0 displacement even if Retraction is not define ( Retraction must be desactivate) . Use the speed_z_hop and the retraction_hop as retraction parameter.
 
-![ZMoveG0.py](./images/ZMoveG0.jpg)
+![ZMoveG0.py](./images/ZmoveG0.jpg)
 
 Errors messages if  Retraction is activate.
 
