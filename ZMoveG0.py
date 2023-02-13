@@ -6,6 +6,7 @@ Z hop for every G0
 
 Author: 5axes
 Version: 1.0
+Version: 1.1  Remove some useless part of the Code.
 
 """
 
@@ -20,30 +21,8 @@ from UM.Message import Message
 from UM.i18n import i18nCatalog
 catalog = i18nCatalog("cura")
 
-__version__ = '1.0'
-
-def is_extrusion_line(line: str) -> bool:
-    """Check if current line is a standard printing segment.
-
-    Args:
-        line (str): Gcode line
-
-    Returns:
-        bool: True if the line is a standard printing segment
-    """
-    return "G1" in line and "X" in line and "Y" in line and "E" in line
-
-def is_not_extrusion_line(line: str) -> bool:
-    """Check if current line is a rapid movement segment.
-
-    Args:
-        line (str): Gcode line
-
-    Returns:
-        bool: True if the line is a standard printing segment
-    """
-    return "G0" in line and "X" in line and "Y" in line and not "E" in line
-        
+__version__ = '1.1'
+       
 class ZMoveG0(Script):
     def getSettingDataString(self):
         return """{
@@ -95,7 +74,7 @@ class ZMoveG0(Script):
         if retraction_hop_enabled == True:
             #
             Logger.log('d', 'Mode Z Hop must not be activated')
-            Message('Mode Z Hop must not be activated', title = catalog.i18nc("@info:title", "Post Processing")).show()
+            Message(catalog.i18nc("@message", "Mode Z Hop must not be activated"), title = catalog.i18nc("@info:title", "Post Processing")).show()
             return None
             
         In_G0 = False
