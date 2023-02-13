@@ -10,15 +10,15 @@ Version: 1.1  Remove some useless part of the Code.
 
 """
 
-from ..Script import Script
-
 import re #To perform the search
 
-from UM.Logger import Logger
+from ..Script import Script
+
 from UM.Application import Application
-from cura.Settings.ExtruderManager import ExtruderManager
+from UM.Logger import Logger
 from UM.Message import Message
 from UM.i18n import i18nCatalog
+
 catalog = i18nCatalog("cura")
 
 __version__ = '1.1'
