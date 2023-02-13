@@ -108,7 +108,10 @@ class ZMoveG0(Script):
                 if currentLine.startswith("G0") :
                     Output_Z=current_z+retraction_hop
                     outPutLine1 = "G1 F{} Z{:.3f}\n".format(speed_z_hop,Output_Z)
-                    outPutLine2 = "\nG1 F{} Z{:.3f}".format(current_z,Output_Z)
+                    Zc = "Z{:.3f}".format(current_z)
+                    Zr = "Z{:.3f}".format(Output_Z)
+                    currentLine=currentLine.replace(Zc, Zr)
+                    outPutLine2 = "\nG1 F{} Z{:.3f}".format(speed_z_hop,current_z)
                     outPutLine = outPutLine1 + currentLine + outPutLine2 
                     lines[line_index] = outPutLine
                         
