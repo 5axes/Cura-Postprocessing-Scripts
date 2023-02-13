@@ -6,22 +6,22 @@ Z hop for ironing
 
 Author: 5axes
 Version: 1.0
+Version: 1.1  Remove some useless part of the Code.
 
 """
 
-from ..Script import Script
-from UM.Logger import Logger
-from UM.Application import Application
 import re #To perform the search
-from cura.Settings.ExtruderManager import ExtruderManager
-from collections import namedtuple
 from enum import Enum
-from typing import List, Tuple
+from ..Script import Script
+
+from UM.Application import Application
+from UM.Logger import Logger
 from UM.Message import Message
 from UM.i18n import i18nCatalog
+
 catalog = i18nCatalog("cura")
 
-__version__ = '1.0'
+__version__ = '1.1'
 
 class Section(Enum):
     """Enum for section type."""
@@ -33,19 +33,6 @@ class Section(Enum):
     INFILL = 4
     SKIN = 5
     SKIN2 = 6
-    
-
-
-def is_begin_layer_line(line: str) -> bool:
-    """Check if current line is the start of a layer section.
-
-    Args:
-        line (str): Gcode line
-
-    Returns:
-        bool: True if the line is the start of a layer section
-    """
-    return line.startswith(";LAYER:")
 
 
 def is_extrusion_line(line: str) -> bool:
@@ -102,7 +89,6 @@ class ZMoveIroning(Script):
             }
         }"""
 
-
 ## -----------------------------------------------------------------------------
 #
 #  Main Prog
@@ -120,8 +106,6 @@ class ZMoveIroning(Script):
         if extruder_id>extruder_count :
             extruder_id=extruder_count
 
-        # Deprecation function
-        # extrud = list(Application.getInstance().getGlobalContainerStack().extruders.values())
         extrud = Application.getInstance().getGlobalContainerStack().extruderList
  
         retraction_hop = float(extrud[extruder_id].getProperty("retraction_hop", "value"))
@@ -132,14 +116,14 @@ class ZMoveIroning(Script):
         if ironingenabled == False:
             #
             Logger.log('d', 'Gcode must be generate with ironing mode')
-            Message('Gcode must be generate with ironing mode', title = catalog.i18nc("@info:title", "Post Processing")).show()
+            Message(catalog.i18nc("@message","Gcode must be generate with ironing mode"), title = catalog.i18nc("@info:title", "Post Processing")).show()
             return None
 
         retraction_hop_enabled= extrud[extruder_id].getProperty("retraction_hop_enabled", "value")
         if retraction_hop_enabled == True:
             #
-            Logger.log('d', 'Mode Z Hop mustnt be activated')
-            Message('Mode Z Hop mustn"t be activated', title = catalog.i18nc("@info:title", "Post Processing")).show()
+            Logger.log('d', 'Mode Z Hop must not be activated')
+            Message(catalog.i18nc("@message","Mode Z Hop must not be activated"), title = catalog.i18nc("@info:title", "Post Processing")).show()
             return None
         
         """Parse Gcode and modify infill portions with an extrusion width gradient."""
@@ -151,11 +135,10 @@ class ZMoveIroning(Script):
             lines = layer.split("\n")
             for line_index, currentLine in enumerate(lines):
 
-                if "Z" in currentLine and "G0" in currentLine:
+                if currentLine.startswith("G0") and "Z" in currentLine :
                         searchZ = re.search(r"Z(\d*\.?\d*)", currentLine)
                         if searchZ:
                             current_z=float(searchZ.group(1))
-                        # Logger.log('d', 'CurZ :' + str(current_z))
                         
                 if is_begin_skin_segment_line(currentLine) and not (currentSection == Section.SKIN):
                     currentSection = Section.SKIN
@@ -187,7 +170,7 @@ class ZMoveIroning(Script):
                     #
                     # comment like ;MESH:NONMESH 
                     #
-                    if ";" in currentLine:
+                    if currentLine.startswith(";") :
                         currentSection = Section.NOTHING
                 #
                 # end of analyse
