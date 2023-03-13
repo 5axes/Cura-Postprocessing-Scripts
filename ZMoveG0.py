@@ -75,7 +75,7 @@ class ZMoveG0(Script):
             #
             Logger.log('d', 'Mode Z Hop must not be activated')
             Message(catalog.i18nc("@message", "Mode Z Hop must not be activated"), title = catalog.i18nc("@info:title", "Post Processing")).show()
-            return None
+            return data
             
         In_G0 = False
         for layer_index, layer in enumerate(data):
