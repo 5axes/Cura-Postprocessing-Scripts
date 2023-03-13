@@ -48,7 +48,6 @@ class ZMoveG0(Script):
 #  Main Prog
 #
 ## -----------------------------------------------------------------------------
-
     def execute(self, data):
 
         current_z = 0
@@ -65,11 +64,13 @@ class ZMoveG0(Script):
             extruder_id=extruder_count
 
         extrud = Application.getInstance().getGlobalContainerStack().extruderList
- 
+        
+        # Get the Cura retraction_hop and speed_z_hop as Zhop parameter
         retraction_hop = float(extrud[extruder_id].getProperty("retraction_hop", "value"))
         speed_z_hop = int(extrud[extruder_id].getProperty("speed_z_hop", "value"))
         speed_z_hop = speed_z_hop * 60
 
+        # Check if Z hop is desactivated
         retraction_hop_enabled= extrud[extruder_id].getProperty("retraction_hop_enabled", "value")
         if retraction_hop_enabled == True:
             #
@@ -88,7 +89,6 @@ class ZMoveG0(Script):
                     if searchZ:
                         current_z=float(searchZ.group(1))
                         Zc = "Z"+searchZ.group(1)
-
 
                 if currentLine.startswith("G0") and not In_G0 :
                     Output_Z=current_z+retraction_hop
