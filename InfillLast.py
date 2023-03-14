@@ -9,7 +9,7 @@
 #------------------------------------------------------------------------------------------------------------------------------------
 #
 #   Version 1.0 13/03/2023 first prototype right now must be use with the relative extrusion activated 
-#                          Zhop Management must be include in this script
+#                          Zhop Management must be include in this script ! Not manage in this release !
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -235,8 +235,8 @@ class InfillLast(Script):
 
             for line_index, line in enumerate(lines):            
 
-                if currentLine.startswith("G0") and "Z" in currentLine :
-                    searchZ = re.search(r"Z(\d*\.?\d*)", currentLine)
+                if line.startswith("G0") and "Z" in line :
+                    searchZ = re.search(r"Z(\d*\.?\d*)", line)
                     if searchZ:
                         current_z=float(searchZ.group(1))
                         Zc = "Z"+searchZ.group(1)
@@ -271,7 +271,7 @@ class InfillLast(Script):
                     currentlayer=int(line[7:])
                     if currentlayer == 0 :
                         # Logger.log('d', "CurrentLayer : {}".format(currentlayer))
-                        idl=2
+                        idl=1
                     else:
                         idl=0
  
@@ -298,9 +298,8 @@ class InfillLast(Script):
                             Logger.log('d', 'Current_z : {}'.format(current_z))
                             outPutLine = "G0 F{} Z{:.3f}\n".format(speed_z_hop,Output_Z)
                             Zr = "Z{:.3f}".format(Output_Z)    
-                            currentLine=line.replace(Zc, Zr)
-                            outPutLine=currentLine.replace("G1", "G0")
-                            lines_skin.append(outPutLine)
+                            outPutLine=line.replace(Zc, Zr)
+                            lines_skin.append(outPutLine.replace("G1", "G0"))
                             Output_Z=current_z
                             outPutLine = "G1 F{} Z{:.3f}\n".format(speed_z_hop,Output_Z)
                             lines_skin.append(outPutLine)
