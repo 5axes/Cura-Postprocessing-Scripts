@@ -219,7 +219,7 @@ class SpoonOrder(Script):
                     layercount=int(line[13:])                    
 
                 if idl >= 1 and line.startswith(";TIME_ELAPSED:"):
-                    lines_not_spoon.append(line)
+                    idl = 1
                                              
                 # ;LAYER:X
                 if is_begin_layer_line(line):  
