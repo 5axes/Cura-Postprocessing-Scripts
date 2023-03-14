@@ -252,6 +252,14 @@ Description: ZMoveIroning for 3D prints. Z hop for ironing
 ![ZMoveIroning.py](./images/ZmoveIroning.jpg)
 
 
+[SpoonOrder.py](SpoonOrder.py)
+-----
+
+Description: SpoonOrder is a script used in the [spoon Anti-warping Plugin](https://github.com/5axes/SpoonAntiWarping), Print every spoon tabs first.
+
+![SpoonOrder.py](./images/SpoonOrder.png)
+
+
 [InfillLast.py](InfillLast.py)
 -----
 
