@@ -9,6 +9,7 @@
 #------------------------------------------------------------------------------------------------------------------------------------
 #
 #   Version 1.0 13/03/2023 first prototype right now must be use with the relative extrusion activated 
+#                          Zhop Management must be include in this script
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -165,7 +166,18 @@ class InfillLast(Script):
             "name": "InfillLast",
             "key": "InfillLast",
             "metadata": {},
-            "version": 2
+            "version": 2,
+            "settings":
+            {
+                "extruder_nb":
+                {
+                    "label": "Extruder Id",
+                    "description": "Define extruder Id in case of multi extruders",
+                    "unit": "",
+                    "type": "int",
+                    "default_value": 1
+                }
+            }           
         }"""
 
     def execute(self, data):
@@ -173,17 +185,45 @@ class InfillLast(Script):
         extrud = Application.getInstance().getGlobalContainerStack().extruderList
         relative_extrusion = bool(extrud[0].getProperty("relative_extrusion", "value"))
         
+        
+        
         if not relative_extrusion:
-            Message("Must be in mode Relative extrusion", title = catalog.i18nc("@info:title", "Post Processing Spoon Order")).show()
+            Message("Must be in mode Relative extrusion", title = catalog.i18nc("@info:title", "Post Processing Skin Last")).show()
             return data
-            
+
+        extruder_id  = self.getSettingValueByKey("extruder_nb")
+        extruder_id = extruder_id -1
+
+        #   machine_extruder_count
+        extruder_count=Application.getInstance().getGlobalContainerStack().getProperty("machine_extruder_count", "value")
+        extruder_count = extruder_count-1
+        if extruder_id>extruder_count :
+            extruder_id=extruder_count
+
+        extrud = Application.getInstance().getGlobalContainerStack().extruderList
+ 
+        # Check if Z hop is desactivated
+        retraction_hop_enabled= extrud[extruder_id].getProperty("retraction_hop_enabled", "value")  
+        
+        # Get the Cura retraction_hop and speed_z_hop as Zhop parameter
+        retraction_hop = float(extrud[extruder_id].getProperty("retraction_hop", "value"))
+        speed_z_hop = int(extrud[extruder_id].getProperty("speed_z_hop", "value"))
+        speed_z_hop = speed_z_hop * 60
+        speed_travel = extrud[0].getProperty("speed_travel", "value")
+        speed_travel = speed_travel * 60 
+       
         idl=0
 
+        current_z = 0
+        Zr = "Z0"
+        Zc = "Z0"
+        
         currentlayer=0
         CurrentE=0
         ResetE=0
         RelativeExtruder = False
         SaveE = -1
+        In_G0 = False
         
         for layer in data:
             layer_index = data.index(layer)
@@ -192,8 +232,15 @@ class InfillLast(Script):
             lines_not_skin = []
             
             lines = layer.split("\n")
-            for line in lines:                  
-                # line_index = lines.index(line)
+
+            for line_index, line in enumerate(lines):            
+
+                if currentLine.startswith("G0") and "Z" in currentLine :
+                    searchZ = re.search(r"Z(\d*\.?\d*)", currentLine)
+                    if searchZ:
+                        current_z=float(searchZ.group(1))
+                        Zc = "Z"+searchZ.group(1)
+                        
                 # Check if the line start with the Comment Char
                 if is_relative_instruction_line(line) and line[0] != ";" :
                     relative_extrusion = True
@@ -217,9 +264,6 @@ class InfillLast(Script):
                 if line.startswith(";LAYER_COUNT:"):
                     # Logger.log("w", "found LAYER_COUNT %s", line[13:])
                     layercount=int(line[13:])                    
-
-                if idl >= 1 and line.startswith(";TIME_ELAPSED:"):
-                    lines_not_skin.append(line)
                                              
                 # ;LAYER:X
                 if is_begin_layer_line(line):  
@@ -230,26 +274,38 @@ class InfillLast(Script):
                         idl=2
                     else:
                         idl=0
-                        
-                if idl >= 1 and is_begin_mesh_line(line) :               
-                    if Marker in line :
-                        # Logger.log('d', "Marker mesh : {}".format(line))
-                        idl = 2
-                    else:
-                        # Logger.log('d', "Not Marker mesh : {}".format(line))
-                        idl = 1
  
                 if is_begin_type_line(line) and idl > 0:
                     if is_begin_skin_segment_line(line):
                         idl=2
                         Logger.log('d', 'layer_lines : {}'.format(line))
+                        if retraction_hop_enabled :
+                            Logger.log('d', 'Output_Z : {}'.format(Output_Z))
+                            Output_Z=current_z+retraction_hop
+                            outPutLine = "G1 F{} Z{:.3f}\n".format(speed_z_hop,Output_Z)
+                            lines_skin.append(outPutLine)
+                            In_G0 = True                        
+                        # Must integrate Zhop Management
                     else :
                         idl=1
                         
                 #---------------------------------------
-                # Add the Spoon line to the spoon path 
+                # Add the Skin line to the Skin path 
                 #---------------------------------------                
                 if idl == 2 :
+                    if line.startswith("G1") and In_G0 :
+                            Output_Z=current_z+retraction_hop
+                            Logger.log('d', 'Current_z : {}'.format(current_z))
+                            outPutLine = "G0 F{} Z{:.3f}\n".format(speed_z_hop,Output_Z)
+                            Zr = "Z{:.3f}".format(Output_Z)    
+                            currentLine=line.replace(Zc, Zr)
+                            outPutLine=currentLine.replace("G1", "G0")
+                            lines_skin.append(outPutLine)
+                            Output_Z=current_z
+                            outPutLine = "G1 F{} Z{:.3f}\n".format(speed_z_hop,Output_Z)
+                            lines_skin.append(outPutLine)
+                            In_G0 = False
+                            
                     lines_skin.append(line)
                 
                 if idl == 1 :
@@ -258,12 +314,14 @@ class InfillLast(Script):
             # Logger.log('d', "idl : {}".format(idl))
             if idl>0 :            
                 result = ";BEGIN_OF_MODIFICATION"
+                for line in lines_not_skin:
+                    result += "\n"
+                    result += line  
+                    
                 for line in lines_skin:
                     result += "\n"
                     result += line
-                for line in lines_not_skin:
-                    result += "\n"
-                    result += line                    
+                  
                 result += ";END_OF_MODIFICATION\n"          
             else:
                 result = "\n".join(lines)
