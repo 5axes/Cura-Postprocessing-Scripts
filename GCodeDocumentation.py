@@ -167,7 +167,9 @@ class GCodeDocumentation(Script):
         replace_string = replace_string + "\n;==============================================================================="
         
         # add extruder specific data to slice info
-        extruders = list(Application.getInstance().getGlobalContainerStack().extruders.values())
+        # extruders = list(Application.getInstance().getGlobalContainerStack().extruders.values())
+        extruders = Application.getInstance().getExtruderManager().getActiveExtruderStacks()
+        
         #   Profile
         GetValStr = extruders[extruder_id].qualityChanges.getMetaData().get("name", "")
         GetLabel = "Profile ( Version Cura " + CuraVersion + " )"
@@ -451,25 +453,43 @@ class GCodeDocumentation(Script):
         #   support_tree_enable 
         if Major < 4 or ( Major == 4 and Minor <= 9 ) : 
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_enable")
-        
-        if support_structure == "tree" :       
-            #   support_tree_angle
-            if adv_desc :
-                replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_angle",5)
-            #   support_tree_branch_distance
-            if adv_desc :
-                replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_distance",5)
-            #   support_tree_branch_diameter
-            if adv_desc :
-                replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_diameter",5)
-            #   support_tree_branch_diameter_angle
-            if adv_desc :
-                replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_diameter_angle",5) 
-            
-        #   support_type
-        replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_type")
+
         #   support_angle
         replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_angle")
+        #   support_type
+        replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_type")        
+        if support_structure == "tree" :
+            if adv_desc :
+                #   support_tree_angle
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_angle",5)
+                #   support_tree_branch_diameter
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_diameter",5)
+                #   support_tree_branch_diameter_angle
+                replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_diameter_angle",5)
+                if ( Major >= 5 and Minor >= 4 ) :
+                    #   support_tree_max_diameter
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_max_diameter",5)
+                    #   support_tree_angle_slow
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_angle_slow",5) 
+                    #   support_tree_max_diameter_increase_by_merges_when_support_to_model
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_max_diameter_increase_by_merges_when_support_to_model",5) 
+                    #   support_tree_min_height_to_model
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_min_height_to_model",5)  
+                    #   support_tree_bp_diameter
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_bp_diameter",5)  
+                    #   support_tree_top_rate
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_top_rate",5)  
+                    #   support_tree_tip_diameter
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_tip_diameter",5)  
+                    #   support_tree_limit_branch_reach
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_limit_branch_reach",5) 
+                    #   support_tree_rest_preference
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_rest_preference",5)                 
+                else:              
+                    #   support_tree_branch_distance
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_distance",5)
+                    #   support_tree_branch_diameter
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_diameter",5)
         #   support_pattern
         if adv_desc :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_pattern")
@@ -530,6 +550,12 @@ class GCodeDocumentation(Script):
         if adv_desc :
             if adhesion_type == "brim" :
                 replace_string = replace_string + self.GetDataExtruder(extruder_id,"brim_width")
+
+        if adv_desc :
+            if ( Major >= 5 and Minor >= 4 ) :
+                if adhesion_type == "brim" :
+                    replace_string = replace_string + self.GetDataExtruder(extruder_id,"brim_smart_ordering")
+                            
         if adv_desc :
             if adhesion_type == "raft" :
                 replace_string = replace_string + self.GetDataExtruder(extruder_id,"raft_surface_layers")
