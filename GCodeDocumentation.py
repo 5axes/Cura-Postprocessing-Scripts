@@ -27,6 +27,7 @@
 # Version 5.04 of 07/05/2020 Who  : 5axes What : Adding support flow info and info on xy_offset (Version 4.6) 
 # Version 5.1.0 of 09/05/2020 Who : 5axes What : Add message for 4.6
 # Version 5.2.0 of 13/02/2022 Who : 5axes What : New Settings
+# Version 5.4.0 of 13/07/2023 Who : 5axes What : Update for 5.4
 #
 #
 import string
@@ -40,7 +41,7 @@ catalog = i18nCatalog("cura")
         
 ## 
 class GCodeDocumentation(Script):
-    version = "5.2.0"
+    version = "5.4.0"
     
     def getSettingDataString(self):
         return """{
@@ -92,7 +93,9 @@ class GCodeDocumentation(Script):
         
         # Deprecation Warning
         # extrud = list(Application.getInstance().getGlobalContainerStack().extruders.values())
-        extrud = Application.getInstance().getGlobalContainerStack().extruderList
+        # extrud = Application.getInstance().getGlobalContainerStack().extruderList
+        extrud = Application.getInstance().getExtruderManager().getActiveExtruderStacks()
+        
         GetVal = extrud[id_ex].getProperty(key, "value")
         GetLabel = Application.getInstance().getGlobalContainerStack().getProperty(key, "label")
         GetType = Application.getInstance().getGlobalContainerStack().getProperty(key, "type")
