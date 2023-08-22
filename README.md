@@ -273,6 +273,7 @@ Description: InfillLast print for the first layer every Infill path at the end o
 -----
 
 Author : Greg Foresi [(GregValiant)](https://github.com/GregValiant)
+
 Description:  This script changes the Z-Hop height from the beginning of the 'Start Layer' to the end of the 'End Layer'.  If the new hop height is 0.0 it negates the z-hop movement. The Z-hop command lines are altered, not removed.
 
 	- This script supports different hop heights for up to 4 extruders.
