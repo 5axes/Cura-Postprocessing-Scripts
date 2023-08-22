@@ -266,3 +266,18 @@ Description: SpoonOrder is a script used in the [spoon Anti-warping Plugin](http
 Description: InfillLast print for the first layer every Infill path at the end of the First Layer. ( Work in progress )
 
 ![InfillLast.py](./images/InfillLast.png)
+
+
+
+[AlterZhops.py](AlterZhops.py)
+-----
+
+Author : Greg Foresi [(GregValiant)](https://github.com/GregValiant)
+Description:  This script changes the Z-Hop height from the beginning of the 'Start Layer' to the end of the 'End Layer'.  If the new hop height is 0.0 it negates the z-hop movement. The Z-hop command lines are altered, not removed.
+
+	- This script supports different hop heights for up to 4 extruders.
+	- Z-Hops at tool change are not affected when 'Alter Z-Hops' runs BEFORE other post-processors that make code insertions just before Tool Change lines
+	- Adaptive Layers is not compatible and there is an exit if it is enabled in Cura
+	- Z-Hops must be enabled for at least one extruder in Cura or the plugin exits.
+
+![AlterZhops.py](./images/AlterZhops.png)
