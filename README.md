@@ -282,3 +282,10 @@ Description:  This script changes the Z-Hop height from the beginning of the 'St
 	- Z-Hops must be enabled for at least one extruder in Cura or the plugin exits.
 
 ![AlterZhops.py](./images/AlterZhops.png)
+
+
+
+[DiagonalZHop.py](DiagonalZHop.py)
+-----
+
+Modifiy existing Zhop to get Diagonal ZHop for 3D prints.
