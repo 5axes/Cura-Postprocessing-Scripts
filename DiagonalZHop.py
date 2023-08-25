@@ -7,6 +7,7 @@ Diagonal Z Hop
 Author: 5axes
 Version: 0.1
 
+Note : https://github.com/Ultimaker/Cura/issues/15583
 """
 
 import re #To perform the search
@@ -86,8 +87,6 @@ class DiagonalZHop(Script):
                 else :
                     if currentLine.startswith("G1") and "Z" in currentLine and not "X" in currentLine and not "Y" in currentLine :
                         In_Zhop = False
-                        Logger.log('d', 'In_Zhop = False')
-                        Logger.log('d', currentLine)
 
                 #
                 # end of analyse
