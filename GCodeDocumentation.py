@@ -1,4 +1,4 @@
-# Copyright (c) 2019 5axes
+# Copyright (c) 2019 - 2023 5axes
 #
 # Description:  This Script add Parameters description in the Header of the G-Code file...
 #               Please look at the option
@@ -28,6 +28,7 @@
 # Version 5.1.0 of 09/05/2020 Who : 5axes What : Add message for 4.6
 # Version 5.2.0 of 13/02/2022 Who : 5axes What : New Settings
 # Version 5.4.0 of 13/07/2023 Who : 5axes What : Update for 5.4
+# Version 5.5.0 of 25/11/2023 Who : 5axes What : Update for 5.5
 #
 #
 import string
@@ -41,7 +42,7 @@ catalog = i18nCatalog("cura")
         
 ## 
 class GCodeDocumentation(Script):
-    version = "5.4.0"
+    version = "5.5.0"
     
     def getSettingDataString(self):
         return """{
