@@ -413,26 +413,20 @@ class GCodeDocumentation(Script):
         GetLabel = Application.getInstance().getGlobalContainerStack().getProperty("cooling", "label")
         if adv_desc :
             replace_string = replace_string + self.SetSect(GetLabel)
-
-        #   cool_fan_enabled
-        if adv_desc :
-            replace_string = replace_string + self.GetDataExtruder(extruder_id,"cool_fan_enabled")           
         #   cool_fan_speed
-        replace_string = replace_string + self.GetDataExtruder(extruder_id,"cool_fan_speed")    
-        #   cool_fan_speed_0
+        replace_string = replace_string + self.GetDataExtruder(extruder_id,"cool_fan_speed")         
         if adv_desc :
+            #   cool_fan_enabled
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"cool_fan_enabled")           
+            #   cool_fan_speed_0
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"cool_fan_speed_0") 		
-        #   cool_fan_full_layer
-        if adv_desc :
+            #   cool_fan_full_layer
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"cool_fan_full_layer")
-        #   cool_min_layer_time
-        if adv_desc :
+            #   cool_min_layer_time
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"cool_min_layer_time")
-        #   cool_min_speed
-        if adv_desc :
+            #   cool_min_speed
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"cool_min_speed")      
-        #   cool_lift_head
-        if adv_desc :
+            #   cool_lift_head
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"cool_lift_head")
             
         #   -----------------------------------  support ------------------------------ 
@@ -490,51 +484,39 @@ class GCodeDocumentation(Script):
                     replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_distance",5)
                     #   support_tree_branch_diameter
                     replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_tree_branch_diameter",5)
-        #   support_pattern
+                    
         if adv_desc :
+            #   support_pattern        
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_pattern")
-        #   support_connect_zigzags
-        if adv_desc :
+            #   support_connect_zigzags
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_connect_zigzags")                                                                                                
-        #   support_infill_rate
-        if adv_desc :
+            #   support_infill_rate
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_infill_rate")
-        #   support_wall_count
-        #   support_brim_enable
-        if adv_desc :
+            #   support_wall_count
+            #   support_brim_enable
             if Major > 4 or ( Major == 4 and Minor >= 8 ) : 
                 replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_wall_count")
                 replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_brim_enable")
                 
-        #   support_z_distance
-        if adv_desc :
+            #   support_z_distance
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_z_distance",5)
-        #   support_xy_distance
-        if adv_desc :
+            #   support_xy_distance
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_xy_distance",5)        
-        #   support_xy_overrides_z
-        if adv_desc :
+            #   support_xy_overrides_z
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_xy_overrides_z",5)
-        #   support_interface_enable
-        if adv_desc :
+            #   support_interface_enable
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_interface_enable")
-        #   support_roof_enable
-        if adv_desc :
+            #   support_roof_enable
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_roof_enable")            
-        #   support_interface_height
-        if adv_desc :
+            #   support_interface_height
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_interface_height") 
-        #   support_roof_height
-        if adv_desc :
+            #   support_roof_height
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_roof_height") 
-        #   support_interface_skip_height
-        if adv_desc :
+            #   support_interface_skip_height
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_interface_skip_height")
-        #   support_interface_density
-        if adv_desc :
+            #   support_interface_density
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_interface_density")            
-        #   support_interface_pattern
-        if adv_desc :
+            #   support_interface_pattern
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"support_interface_pattern")
                              
 
@@ -576,40 +558,33 @@ class GCodeDocumentation(Script):
             GetLabel = Application.getInstance().getGlobalContainerStack().getProperty("dual", "label")
             if adv_desc :
                 replace_string = replace_string + self.SetSect(GetLabel)
-            #   prime_tower_enable
-            if adv_desc :
+                #   prime_tower_enable
                 replace_string = replace_string + self.GetDataExtruder(extruder_id,"prime_tower_enable")
-            #   prime_tower_size
-            if adv_desc :
+                #   prime_tower_size
                 replace_string = replace_string + self.GetDataExtruder(extruder_id,"prime_tower_size",5)
-            #   prime_tower_position_x
-            if adv_desc :
+                #   prime_tower_position_x
                 replace_string = replace_string + self.GetDataExtruder(extruder_id,"prime_tower_position_x",5)
-            #   prime_tower_position_y
-            if adv_desc :
+                #   prime_tower_position_y
                 replace_string = replace_string + self.GetDataExtruder(extruder_id,"prime_tower_position_y",5)
-
 
         #   -----------------------------------  meshfix ------------------------------ 
         GetLabel = Application.getInstance().getGlobalContainerStack().getProperty("meshfix", "label")
         if adv_desc :
             replace_string = replace_string + self.SetSect(GetLabel)
-
-        #   meshfix_union_all
-        if adv_desc :
+            #   meshfix_union_all
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"meshfix_union_all")
-        #   meshfix_union_all_remove_holes
-        if adv_desc :
+            #   meshfix_union_all_remove_holes
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"meshfix_union_all_remove_holes")
-        #   meshfix_maximum_resolution 
-        if adv_desc :
+            #   meshfix_maximum_resolution 
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"meshfix_maximum_resolution")
-        #   meshfix_maximum_travel_resolution
-        if adv_desc :
+            #   meshfix_maximum_travel_resolution
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"meshfix_maximum_travel_resolution")
-        #   meshfix_maximum_deviation
-        if adv_desc :
+            #   meshfix_maximum_deviation
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"meshfix_maximum_deviation")
+            #   meshfix_maximum_deviation
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"meshfix_fluid_motion_enabled") 
+            #   remove_empty_first_layers
+            replace_string = replace_string + self.GetDataExtruder(extruder_id,"remove_empty_first_layers")            
             
         #   -----------------------------------  blackmagic ------------------------------ 
         GetLabel = Application.getInstance().getGlobalContainerStack().getProperty("blackmagic", "label")
