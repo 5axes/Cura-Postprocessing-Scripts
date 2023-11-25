@@ -390,23 +390,17 @@ class GCodeDocumentation(Script):
         #   retraction_combing
         if adv_desc :
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"retraction_combing")
-        #   travel_retract_before_outer_wall
-        if adv_desc :
+            #   travel_retract_before_outer_wall
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"travel_retract_before_outer_wall",20)
-        #   travel_avoid_other_parts
-        if adv_desc :
+            #   travel_avoid_other_parts
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"travel_avoid_other_parts",20)
-        #   travel_avoid_supports
-        if adv_desc :
+            #   travel_avoid_supports
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"travel_avoid_supports",20)
-        #   travel_avoid_distance
-        if adv_desc :
+            #   travel_avoid_distance
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"travel_avoid_distance",20)                                                                                                
-        #   retraction_hop_enabled
-        if adv_desc :
+            #   retraction_hop_enabled
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"retraction_hop_enabled",20)  
-        #   retraction_hop
-        if adv_desc :
+            #   retraction_hop
             replace_string = replace_string + self.GetDataExtruder(extruder_id,"retraction_hop",20)
             
         #   -----------------------------------  cooling ----------------------------- 
