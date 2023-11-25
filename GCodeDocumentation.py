@@ -148,7 +148,7 @@ class GCodeDocumentation(Script):
         
         
         # test depuis 3.6
-        if Major < 4 or Minor < 6 :
+        if Major < 4 and Minor < 6 :
             _msg = "Attention Version Cura " + str(CuraVersion)
         
         if _msg != None and _msg != '':
