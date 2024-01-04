@@ -182,12 +182,15 @@ class CheckFirstSpeed(Script):
         #   machine_extruder_count
         extruder_count=int(Application.getInstance().getGlobalContainerStack().getProperty("machine_extruder_count", "value"))
         extruder_count = extruder_count-1
-        extruder_nr = int(Application.getInstance().getGlobalContainerStack().getProperty("extruder_nr", "value"))
+        extruder_stack = Application.getInstance().getExtruderManager().getActiveExtruderStacks() 
+        extruder_nr=len(extruder_stack)
         extruder_id=int(Application.getInstance().getGlobalContainerStack().getProperty("wall_extruder_nr", "value"))
         Logger.log('d', "extruder_count --> " + str(extruder_count))
         Logger.log('d', "extruder_nr --> " + str(extruder_nr))
         Logger.log('d', "extruder_id    --> " + str(extruder_id))
  
+
+        
         if extruder_id == -1 :
             extruder_id=extruder_nr
             
