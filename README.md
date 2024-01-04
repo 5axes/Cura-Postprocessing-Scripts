@@ -172,6 +172,25 @@ First layer speed after modification with the script.
 	
 	
 ![First layer speed after modification](./images/result.png)
+
+[CheckFirstSpeed.py](CheckFirstSpeed.py)
+----
+
+Script to modifiy the first layer infill and Check the first Wall Speed Bug Cura 5.6 
+
+![CheckFirstSpeed.py](./images/CheckFirstSpeed.jpg)
+
+Script used to fix a bug in Cura versions 5.5 and 5.6 [bug on github](https://github.com/Ultimaker/Cura/issues/17594)
+	
+Original first layer speed before modification
+	
+	
+![First layer speed](./images/CheckFirstSpeedorigine.png)
+
+First layer speed after modification with the script and a first infill speed of 30 mm/s.
+	
+	
+![First layer speed after modification](./images/CheckFirstSpeedresult.png)
 	
 	
 [SlowZ.py](SlowZ.py)
