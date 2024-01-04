@@ -161,16 +161,7 @@ class CheckFirstSpeed(Script):
                     "description": "Option to replace wall speed on first layer (Cura 5.6 bug fix).",
                     "type": "bool",
                     "default_value": true
-                },
-                "extruder_nb":
-                {
-                    "label": "Extruder Id",
-                    "description": "Define extruder Id in case of multi extruders",
-                    "unit": "",
-                    "type": "int",
-                    "default_value": 1,
-                    "enabled": "replacewallspeed"
-                }                
+                }               
             }
         }"""
 
@@ -187,12 +178,19 @@ class CheckFirstSpeed(Script):
         InfillSpeed = float(self.getSettingValueByKey("infillspeed")) * 60
         checkFirstWallSpeed = bool(self.getSettingValueByKey("replacewallspeed"))
         modifyFirstInfillSpeed = bool(self.getSettingValueByKey("modifyinfillspeed"))
-        extruder_id  = int(self.getSettingValueByKey("extruder_nb"))
-        extruder_id = extruder_id -1
 
         #   machine_extruder_count
-        extruder_count=Application.getInstance().getGlobalContainerStack().getProperty("machine_extruder_count", "value")
+        extruder_count=int(Application.getInstance().getGlobalContainerStack().getProperty("machine_extruder_count", "value"))
         extruder_count = extruder_count-1
+        extruder_nr = int(Application.getInstance().getGlobalContainerStack().getProperty("extruder_nr", "value"))
+        extruder_id=int(Application.getInstance().getGlobalContainerStack().getProperty("wall_extruder_nr", "value"))
+        Logger.log('d', "extruder_count --> " + str(extruder_count))
+        Logger.log('d', "extruder_nr --> " + str(extruder_nr))
+        Logger.log('d', "extruder_id    --> " + str(extruder_id))
+ 
+        if extruder_id == -1 :
+            extruder_id=extruder_nr
+            
         if extruder_id>extruder_count :
             extruder_id=extruder_count
                 
