@@ -184,11 +184,8 @@ class CheckFirstSpeed(Script):
         extruder_count = extruder_count-1
         extruder_stack = Application.getInstance().getExtruderManager().getActiveExtruderStacks() 
         extruder_nr=len(extruder_stack)
+        extruder_nr = int(Application.getInstance().getExtruderManager().getActiveExtruderStacks()[0].getProperty("extruder_nr", "value"))
         extruder_id=int(Application.getInstance().getGlobalContainerStack().getProperty("wall_extruder_nr", "value"))
-        Logger.log('d', "extruder_count --> " + str(extruder_count))
-        Logger.log('d', "extruder_nr --> " + str(extruder_nr))
-        Logger.log('d', "extruder_id    --> " + str(extruder_id))
- 
 
         
         if extruder_id == -1 :
@@ -199,6 +196,9 @@ class CheckFirstSpeed(Script):
                 
         #   speed_print_layer_0 
         self._speed_print_layer_0 = float(self.GetDataExtruder(extruder_id,"speed_print_layer_0"))
+        Logger.log('d', "extruder_count      --> " + str(extruder_count))
+        Logger.log('d', "extruder_nr         --> " + str(extruder_nr))
+        Logger.log('d', "extruder_id         --> " + str(extruder_id))
         Logger.log('d', "speed_print_layer_0 --> " + str(self._speed_print_layer_0) )
 
         idl=0
