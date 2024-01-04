@@ -12,11 +12,16 @@
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
-from ..Script import Script
-from UM.Logger import Logger
-from UM.Application import Application
+import string
 import re # To perform the search
+from ..Script import Script
+from UM.Application import Application # To get the current printer's settings.
+from cura.CuraVersion import CuraVersion  # type: ignore
+from UM.Logger import Logger
+
 from enum import Enum
+
+
 
 __version__ = '1.0'
 
@@ -96,6 +101,28 @@ def is_begin_skin_segment_line(line: str) -> bool:
         bool: True if the line is the start of an skin section
     """
     return line.startswith(";TYPE:SKIN")
+
+def is_begin_inner_wall_segment_line(line: str) -> bool:
+    """Check if current line is the start of an inner wall.
+
+    Args:
+        line (str): Gcode line
+
+    Returns:
+        bool: True if the line is the start of an inner wall section
+    """
+    return line.startswith(";TYPE:WALL-INNER")
+
+def is_begin_outer_wall_segment_line(line: str) -> bool:
+    """Check if current line is the start of an outer wall.
+
+    Args:
+        line (str): Gcode line
+
+    Returns:
+        bool: True if the line is the start of an outer wall section
+    """
+    return line.startswith(";TYPE:WALL-OUTER")
     
 class CheckFirstSpeed(Script):
     def __init__(self):
@@ -120,21 +147,37 @@ class CheckFirstSpeed(Script):
                     "maximum_value": 100,
                     "maximum_value_warning": 50
                 },
-                "checkwallspeed":
+                "replacewallspeed":
                 {
-                    "label": "Check Wall Speed",
-                    "description": "Option to test wall speed on first layer (Cura 5.6 bug fix).",
+                    "label": "Replace Wall Speed",
+                    "description": "Option to replace wall speed on first layer (Cura 5.6 bug fix).",
                     "type": "bool",
                     "default_value": true
                 }                
             }
         }"""
 
+    # Get the value
+    def GetDataExtruder(self,id_ex,key,dec=0):
+        
+        extruder_stack = Application.getInstance().getExtruderManager().getActiveExtruderStacks()
+        GetVal = extruder_stack[id_ex].getProperty(key, "value")
+                
+        return GetVal
+        
     def execute(self, data):
 
         InfillSpeed = float(self.getSettingValueByKey("infillspeed")) * 60
-        CheckFirestWallSpeed = bool(self.getSettingValueByKey("checkwallspeed"))
+        checkFirstWallSpeed = bool(self.getSettingValueByKey("replacewallspeed"))
 
+        #   machine_extruder_count
+        extruder_count=Application.getInstance().getGlobalContainerStack().getProperty("machine_extruder_count", "value")
+        extruder_count = extruder_count-1
+        extruder_id=extruder_count
+
+        #   speed_print_layer_0 
+        self._speed_print_layer_0 = float(self.GetDataExtruder(extruder_id,"speed_print_layer_0"))
+        Logger.log('d', "speed_print_layer_0 --> " + str(self._cool_min_layer_time) )
 
         idl=0
         
@@ -156,12 +199,12 @@ class CheckFirstSpeed(Script):
                     if is_begin_skin_segment_line(line):
                         idl=2
                         ReplaceSpeedInstruction="F" + str(InfillSpeed)
-                    elif is_begin_inner_wall_segment_line(line) and  :
+                    elif is_begin_inner_wall_segment_line(line) and checkFirstWallSpeed :
                         idl=2
-                        ReplaceSpeedInstruction="F" + str(speed_print_layer_0)                        
-                    elif is_begin_outer_wall_segment_line(line) and  :
+                        ReplaceSpeedInstruction="F" + str(self._speed_print_layer_0)                        
+                    elif is_begin_outer_wall_segment_line(line) and checkFirstWallSpeed :
                         idl=2
-                        ReplaceSpeedInstruction="F" + str(speed_print_layer_0)                       
+                        ReplaceSpeedInstruction="F" + str(self._speed_print_layer_0)                       
                     else :
                         idl=1
                 
