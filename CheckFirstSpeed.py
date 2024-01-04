@@ -161,6 +161,15 @@ class CheckFirstSpeed(Script):
                     "description": "Option to replace wall speed on first layer (Cura 5.6 bug fix).",
                     "type": "bool",
                     "default_value": true
+                },
+                "extruder_nb":
+                {
+                    "label": "Extruder Id",
+                    "description": "Define extruder Id in case of multi extruders",
+                    "unit": "",
+                    "type": "int",
+                    "default_value": 1,
+                    "enabled": "replacewallspeed"
                 }                
             }
         }"""
@@ -178,12 +187,15 @@ class CheckFirstSpeed(Script):
         InfillSpeed = float(self.getSettingValueByKey("infillspeed")) * 60
         checkFirstWallSpeed = bool(self.getSettingValueByKey("replacewallspeed"))
         modifyFirstInfillSpeed = bool(self.getSettingValueByKey("modifyinfillspeed"))
+        extruder_id  = int(self.getSettingValueByKey("extruder_nb"))
+        extruder_id = extruder_id -1
 
         #   machine_extruder_count
         extruder_count=Application.getInstance().getGlobalContainerStack().getProperty("machine_extruder_count", "value")
         extruder_count = extruder_count-1
-        extruder_id=extruder_count
-
+        if extruder_id>extruder_count :
+            extruder_id=extruder_count
+                
         #   speed_print_layer_0 
         self._speed_print_layer_0 = float(self.GetDataExtruder(extruder_id,"speed_print_layer_0"))
         Logger.log('d', "speed_print_layer_0 --> " + str(self._speed_print_layer_0) )
@@ -208,15 +220,15 @@ class CheckFirstSpeed(Script):
                     if is_begin_skin_segment_line(line) and modifyFirstInfillSpeed :
                         idl=4
                         ReplaceSpeedInstruction="F" + str(InfillSpeed)
-                        Logger.log('d', 'Skin line : {}'.format(ReplaceSpeedInstruction)) 
+                        # Logger.log('d', 'Skin line : {}'.format(ReplaceSpeedInstruction)) 
                     elif is_begin_inner_wall_segment_line(line) and checkFirstWallSpeed :
                         idl=3
                         ReplaceSpeedInstruction="F" + str(self._speed_print_layer_0*60)
-                        Logger.log('d', 'Inner Wall line : {}'.format(ReplaceSpeedInstruction))                        
+                        # Logger.log('d', 'Inner Wall line : {}'.format(ReplaceSpeedInstruction))                        
                     elif is_begin_outer_wall_segment_line(line) and checkFirstWallSpeed :
                         idl=2
                         ReplaceSpeedInstruction="F" + str(self._speed_print_layer_0*60)
-                        Logger.log('d', 'Outer Wall line : {}'.format(ReplaceSpeedInstruction))                        
+                        # Logger.log('d', 'Outer Wall line : {}'.format(ReplaceSpeedInstruction))                        
                     else :
                         idl=1
                 
