@@ -2,13 +2,13 @@
 #
 # Cura PostProcessing Script
 # Author:   5axes
-# Date:     January 06, 2024
+# Date:     January 04, 2024
 #
 # Description:  postprocessing script to modifiy the first layer infill and Check the first Wall Speed Bug Cura 5.6 
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 #
-#   Version 1.0 06/01/2024
+#   Version 1.0 04/01/2024
 #
 #------------------------------------------------------------------------------------------------------------------------------------
 
@@ -136,6 +136,13 @@ class CheckFirstSpeed(Script):
             "version": 2,
             "settings":
             {
+                "modifyinfillspeed":
+                {
+                    "label": "Modify Infill Speed",
+                    "description": "Option to modify First layer infill speed value.",
+                    "type": "bool",
+                    "default_value": true
+                },               
                 "infillspeed":
                 {
                     "label": "First layer infill speed",
@@ -145,7 +152,8 @@ class CheckFirstSpeed(Script):
                     "default_value": 30,
                     "minimum_value": 1,
                     "maximum_value": 100,
-                    "maximum_value_warning": 50
+                    "maximum_value_warning": 50,
+                    "enabled": "modifyinfillspeed"
                 },
                 "replacewallspeed":
                 {
@@ -169,6 +177,7 @@ class CheckFirstSpeed(Script):
 
         InfillSpeed = float(self.getSettingValueByKey("infillspeed")) * 60
         checkFirstWallSpeed = bool(self.getSettingValueByKey("replacewallspeed"))
+        modifyFirstInfillSpeed = bool(self.getSettingValueByKey("modifyinfillspeed"))
 
         #   machine_extruder_count
         extruder_count=Application.getInstance().getGlobalContainerStack().getProperty("machine_extruder_count", "value")
@@ -177,7 +186,7 @@ class CheckFirstSpeed(Script):
 
         #   speed_print_layer_0 
         self._speed_print_layer_0 = float(self.GetDataExtruder(extruder_id,"speed_print_layer_0"))
-        Logger.log('d', "speed_print_layer_0 --> " + str(self._cool_min_layer_time) )
+        Logger.log('d', "speed_print_layer_0 --> " + str(self._speed_print_layer_0) )
 
         idl=0
         
@@ -196,15 +205,18 @@ class CheckFirstSpeed(Script):
                         idl=0
                 
                 if is_begin_type_line(line) and idl > 0:
-                    if is_begin_skin_segment_line(line):
-                        idl=2
+                    if is_begin_skin_segment_line(line) and modifyFirstInfillSpeed :
+                        idl=4
                         ReplaceSpeedInstruction="F" + str(InfillSpeed)
+                        Logger.log('d', 'Skin line : {}'.format(ReplaceSpeedInstruction)) 
                     elif is_begin_inner_wall_segment_line(line) and checkFirstWallSpeed :
-                        idl=2
-                        ReplaceSpeedInstruction="F" + str(self._speed_print_layer_0)                        
+                        idl=3
+                        ReplaceSpeedInstruction="F" + str(self._speed_print_layer_0*60)
+                        Logger.log('d', 'Inner Wall line : {}'.format(ReplaceSpeedInstruction))                        
                     elif is_begin_outer_wall_segment_line(line) and checkFirstWallSpeed :
                         idl=2
-                        ReplaceSpeedInstruction="F" + str(self._speed_print_layer_0)                       
+                        ReplaceSpeedInstruction="F" + str(self._speed_print_layer_0*60)
+                        Logger.log('d', 'Outer Wall line : {}'.format(ReplaceSpeedInstruction))                        
                     else :
                         idl=1
                 
@@ -214,9 +226,9 @@ class CheckFirstSpeed(Script):
                         line_index = lines.index(line)
                         save_F=float(searchF.group(1)) 
                         instructionF="F"+str(searchF.group(1))
-                        Logger.log('d', 'save_F       : {:f}'.format(save_F))
-                        Logger.log('d', 'line : {}'.format(line))
-                        Logger.log('d', 'line replace : {}'.format(line.replace(instructionF,ReplaceSpeedInstruction)))
+                        # Logger.log('d', 'save_F       : {:f}'.format(save_F))
+                        # Logger.log('d', 'line : {}'.format(line))
+                        # Logger.log('d', 'line replace : {}'.format(line.replace(instructionF,ReplaceSpeedInstruction)))
                         lines[line_index]=line.replace(instructionF,ReplaceSpeedInstruction)
                         
             result = "\n".join(lines)
