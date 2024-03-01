@@ -47,7 +47,7 @@ class startHeatingAtPercentage(Script):
             {
                 "bedTempPercentage":
                 {
-                    "label": "Nozzle temperature percentage to start heating the nozzle",
+                    "label": "Bed temperature percentage to start heating the nozzle",
                     "description": "What is the percentage of bed heating to start heating the nozzle.",
                     "type": "float",
                     "unit": "%",
